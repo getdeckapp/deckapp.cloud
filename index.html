@@ -1,0 +1,838 @@
+<!doctype html>
+<html lang="en" class="h-full scroll-smooth">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Deck — Job-class observability for Laravel</title>
+  <meta name="description" content="Horizon flies the workers. Deck runs the operation — durable per-job history, cooperative cancellation, and stale-job alerts that survive past Redis retention.">
+  <meta property="og:title" content="Deck — Job-class observability for Laravel">
+  <meta property="og:description" content="Horizon flies the workers. Deck runs the operation.">
+  <meta property="og:type" content="website">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 32 32' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='32' height='32' rx='8' fill='%234f46e5'/%3E%3Cpath d='M8 10.5h15' stroke='white' stroke-width='2' stroke-linecap='round'/%3E%3Cpath d='M8 16h11' stroke='white' stroke-width='2' stroke-linecap='round' opacity='.92'/%3E%3Cpath d='M8 21.5h7' stroke='white' stroke-width='2' stroke-linecap='round' opacity='.84'/%3E%3Ccircle cx='22.5' cy='21.5' r='3' fill='white'/%3E%3Ccircle cx='22.5' cy='21.5' r='1.25' fill='%234f46e5'/%3E%3C/svg%3E">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ["Inter Tight", "ui-sans-serif", "system-ui", "sans-serif"],
+            mono: ["JetBrains Mono", "ui-monospace", "SFMono-Regular", "Menlo", "monospace"],
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    html { font-feature-settings: "ss01","cv01","cv11"; }
+    body {
+      font-family: "Inter Tight", ui-sans-serif, system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    .font-mono, code, pre, kbd { font-family: "JetBrains Mono", ui-monospace, monospace; }
+    @keyframes ping-slow { 75%,100% { transform: scale(2); opacity: 0; } }
+    .animate-ping-slow { animation: ping-slow 2s cubic-bezier(0,0,.2,1) infinite; }
+  </style>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+</head>
+<body class="antialiased bg-white text-zinc-900">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    // ─────────────────────────────────────────────── chart data ──
+    const JOB_VOLUME = [42,38,31,26,22,20,29,47,64,73,82,91,88,95,78,64,71,68,54,49,41,36,30,28];
+
+    // ──────────────────────────────────────────────── icons ──────
+    const IC = {
+      check:   "M4.5 12.75l6 6 9-13.5",
+      x:       "M6 18L18 6M6 6l12 12",
+      arrow:   "M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3",
+      github:  "M12 2C6.475 2 2 6.475 2 12c0 4.425 2.864 8.183 6.839 9.504.5.092.682-.217.682-.482v-1.689c-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.203 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855v2.748c0 .268.18.578.688.481A10.02 10.02 0 0022 12c0-5.525-4.475-10-10-10z",
+      bolt:    "M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z",
+      shield:  "M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z",
+      history: "M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z",
+      search:  "m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z",
+      pause:   "M14.25 9v6m-4.5 0V9M21 12a9 9 0 11-18 0 9 9 0 0118 0z",
+      alert:   "M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zM12 8.25v4.5m0 3h.008v.008H12v-.008z",
+      cloud:   "M2.25 15a4.5 4.5 0 004.5 4.5H18a3.75 3.75 0 001.332-7.257 3 3 0 00-3.758-3.848 5.25 5.25 0 00-10.233 2.33A4.502 4.502 0 002.25 15z",
+      cli:     "M6.75 7.5l3 2.25-3 2.25m4.5 0h3m-9 8.25h13.5A2.25 2.25 0 0021 18V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v12a2.25 2.25 0 002.25 2.25z",
+      copy:    "M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184",
+      mail:    "M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75",
+    };
+
+    function Icon({ d, size = 16, className = "", strokeWidth = 1.75 }) {
+      return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} className={className} aria-hidden="true">
+          <path strokeLinecap="round" strokeLinejoin="round" d={d} />
+        </svg>
+      );
+    }
+
+    // ──────────────────────────────────────────────── logo ───────
+    function Logo({ size = "md", variant = "light", showLabel = true }) {
+      const s = { sm: { mark: 30, text: "text-[15px]" }, md: { mark: 36, text: "text-[16px]" }, lg: { mark: 48, text: "text-[20px]" } }[size] || {};
+      const dark = variant === "dark";
+      const gradId = `lg-${variant}-${size}`;
+      const hiId = `lh-${variant}-${size}`;
+      return (
+        <div className="flex items-center gap-2.5">
+          <svg width={s.mark} height={s.mark} viewBox="0 0 40 40" aria-hidden="true" className="shrink-0">
+            <defs>
+              <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor={dark ? "#7c83f7" : "#6366f1"} />
+                <stop offset="100%" stopColor={dark ? "#4f46e5" : "#4338ca"} />
+              </linearGradient>
+              <linearGradient id={hiId} x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="rgba(255,255,255,0.18)" />
+                <stop offset="55%" stopColor="rgba(255,255,255,0)" />
+              </linearGradient>
+            </defs>
+            <rect x="6" y="11" width="22" height="22" rx="4" fill={`url(#${gradId})`} opacity="0.35"/>
+            <rect x="9" y="9" width="22" height="22" rx="4" fill={`url(#${gradId})`} opacity="0.6"/>
+            <rect x="12" y="7" width="22" height="22" rx="4" fill={`url(#${gradId})`}/>
+            <rect x="12" y="7" width="22" height="22" rx="4" fill={`url(#${hiId})`}/>
+            <circle cx="27" cy="21" r="3.2" fill="white"/>
+            <circle cx="27" cy="21" r="1.4" fill={dark ? "#4f46e5" : "#4338ca"}/>
+            <path d="M16 13h7" stroke="white" strokeWidth="1.6" strokeLinecap="round" opacity="0.92"/>
+            <path d="M16 17h11" stroke="white" strokeWidth="1.6" strokeLinecap="round" opacity="0.7"/>
+          </svg>
+          {showLabel && (
+            <div className="leading-none">
+              <p className={`${s.text} font-semibold tracking-[-0.025em] ${dark ? "text-white" : "text-zinc-950"}`}>Deck</p>
+              <p className={`mt-0.5 font-mono text-[9.5px] font-semibold uppercase tracking-[0.14em] ${dark ? "text-indigo-300/80" : "text-indigo-600/80"}`}>Queue control plane</p>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // ──────────────────────────────────────────────── nav ────────
+    function Nav() {
+      const [scrolled, setScrolled] = useState(false);
+      useEffect(() => {
+        const fn = () => setScrolled(window.scrollY > 8);
+        window.addEventListener("scroll", fn);
+        return () => window.removeEventListener("scroll", fn);
+      }, []);
+      return (
+        <header className={`sticky top-0 z-40 transition ${scrolled ? "border-zinc-200/60 bg-white/80 backdrop-blur-md" : "border-transparent bg-transparent"} border-b`}>
+          <div className="mx-auto flex max-w-[1200px] items-center justify-between gap-6 px-6 py-3.5">
+            <a href="#" className="rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+              <Logo size="sm" />
+            </a>
+            <nav className="hidden items-center gap-6 text-[13.5px] font-medium text-zinc-600 lg:flex">
+              <a href="#features" className="hover:text-zinc-900">Features</a>
+              <a href="#compare" className="hover:text-zinc-900">vs Horizon</a>
+              <a href="#code" className="hover:text-zinc-900">Code</a>
+              <a href="#pricing" className="hover:text-zinc-900">Pricing</a>
+            </nav>
+            <div className="flex items-center gap-2">
+              <a href="https://github.com/tormjens/deck" target="_blank" rel="noopener" className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[13px] font-medium text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900">
+                <Icon d={IC.github} size={14} strokeWidth={0} className="fill-current"/>
+                <span className="hidden sm:inline">GitHub</span>
+              </a>
+              <a href="#waitlist" className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-900 px-3 py-1.5 text-[13px] font-semibold text-white shadow-[0_1px_0_rgba(255,255,255,0.18)_inset,0_1px_2px_rgba(15,23,42,0.20)] hover:bg-zinc-800">
+                Join waitlist
+                <span className="opacity-60">→</span>
+              </a>
+            </div>
+          </div>
+        </header>
+      );
+    }
+
+    // ──────────────────────────────────────────────── hero ───────
+    function Hero() {
+      return (
+        <section className="relative overflow-hidden">
+          {/* Aurora */}
+          <div className="absolute left-1/2 top-0 -z-10 h-[640px] w-[1200px] -translate-x-1/2 opacity-80"
+            style={{ background: "radial-gradient(50% 60% at 50% 0%, rgba(99,102,241,0.22) 0%, rgba(99,102,241,0.04) 50%, transparent 80%)" }} />
+          <div className="absolute left-1/2 top-32 -z-10 h-[440px] w-[900px] -translate-x-1/2"
+            style={{ background: "radial-gradient(40% 50% at 80% 30%, rgba(244,114,182,0.10) 0%, transparent 60%), radial-gradient(40% 50% at 20% 50%, rgba(56,189,248,0.10) 0%, transparent 60%)" }} />
+          {/* Dot grid */}
+          <div className="absolute inset-x-0 top-0 -z-10 h-[640px] opacity-[0.40]"
+            style={{ backgroundImage: "radial-gradient(rgba(15,23,42,0.10) 1px, transparent 1px)", backgroundSize: "28px 28px", maskImage: "radial-gradient(ellipse 80% 60% at 50% 35%, black 0%, transparent 70%)", WebkitMaskImage: "radial-gradient(ellipse 80% 60% at 50% 35%, black 0%, transparent 70%)" }} />
+
+          <div className="mx-auto max-w-[1200px] px-6 pt-16 pb-12 lg:pt-24 lg:pb-16">
+            <div className="mx-auto max-w-[820px] text-center">
+              {/* Eyebrow pill */}
+              <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-zinc-200/80 bg-white/70 px-3 py-1 text-[12px] font-medium text-zinc-700 shadow-[0_1px_0_rgba(255,255,255,0.7)_inset,0_1px_2px_rgba(15,23,42,0.04)] backdrop-blur">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-indigo-50 px-2 py-0.5 font-mono text-[10.5px] font-semibold uppercase tracking-[0.10em] text-indigo-700 ring-1 ring-inset ring-indigo-600/20">
+                  <span className="relative inline-flex size-1.5">
+                    <span className="absolute inset-0 animate-ping-slow rounded-full bg-indigo-500 opacity-70" />
+                    <span className="relative size-1.5 rounded-full bg-indigo-500" />
+                  </span>
+                  Deck Cloud
+                </span>
+                <span className="text-zinc-600">Early access · join the waitlist</span>
+                <span className="text-zinc-300">→</span>
+              </div>
+
+              <h1 className="font-semibold tracking-[-0.035em] text-zinc-950 text-[52px] leading-[1.02] sm:text-[64px] lg:text-[76px]">
+                Job-class<br/>
+                <span className="relative inline-block">
+                  <span className="bg-gradient-to-br from-indigo-600 via-indigo-500 to-violet-600 bg-clip-text text-transparent">observability</span>
+                  <span className="absolute inset-x-0 -bottom-1 h-1 bg-gradient-to-r from-transparent via-indigo-500/40 to-transparent" />
+                </span>
+                <br/>
+                for Laravel.
+              </h1>
+
+              <p className="mx-auto mt-7 max-w-[600px] text-[17px] leading-[1.6] text-zinc-600">
+                Horizon flies the workers. <span className="font-semibold text-zinc-900">Deck</span> runs the operation — durable per-job history,
+                cooperative cancellation, and stale-job alerts that survive past Redis retention.
+              </p>
+
+              <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
+                <a href="#waitlist"
+                  className="group inline-flex items-center gap-2 rounded-xl bg-zinc-900 px-5 py-3 text-[14px] font-semibold text-white shadow-[0_1px_0_rgba(255,255,255,0.18)_inset,0_2px_4px_rgba(15,23,42,0.20),0_8px_24px_-4px_rgba(15,23,42,0.30)] ring-1 ring-zinc-950 hover:bg-zinc-800">
+                  Join the waitlist
+                  <span className="opacity-60 transition group-hover:translate-x-0.5">→</span>
+                </a>
+                <a href="#code"
+                  className="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-[14px] font-semibold text-zinc-900 ring-1 ring-inset ring-zinc-200 shadow-[0_1px_2px_rgba(15,23,42,0.04)] hover:bg-zinc-50 hover:ring-zinc-300">
+                  <Icon d={IC.cli} size={14} />
+                  See the API
+                </a>
+              </div>
+
+              <div className="mt-7 flex items-center justify-center">
+                <code className="inline-flex items-center gap-3 rounded-lg border border-zinc-200/80 bg-white/80 px-4 py-2 font-mono text-[12.5px] text-zinc-700 shadow-[0_1px_2px_rgba(15,23,42,0.04)] backdrop-blur">
+                  <span className="text-zinc-400 select-none">$</span>
+                  <span><span className="text-indigo-600 font-semibold">composer</span> require tormjens/deck</span>
+                  <CopyButton text="composer require tormjens/deck" />
+                </code>
+              </div>
+            </div>
+
+            {/* Dashboard mockup */}
+            <div className="relative mt-14">
+              <DashboardMockup />
+            </div>
+          </div>
+        </section>
+      );
+    }
+
+    function CopyButton({ text }) {
+      const [copied, setCopied] = useState(false);
+      const copy = () => {
+        navigator.clipboard?.writeText(text).then(() => { setCopied(true); setTimeout(() => setCopied(false), 1800); });
+      };
+      return (
+        <button onClick={copy} className="ml-1 text-zinc-400 hover:text-zinc-700 transition" aria-label="Copy command">
+          {copied
+            ? <Icon d={IC.check} size={13} className="text-emerald-600" />
+            : <Icon d={IC.copy} size={13} />}
+        </button>
+      );
+    }
+
+    // ──────────────────────────────────────── dashboard mockup ───
+    function DashboardMockup() {
+      return (
+        <div className="relative mx-auto max-w-[1100px]">
+          <div className="absolute -inset-8 -z-10 rounded-[36px] bg-gradient-to-b from-indigo-500/15 via-transparent to-transparent blur-2xl" />
+          <div className="overflow-hidden rounded-2xl border border-zinc-200/80 bg-white shadow-[0_1px_0_rgba(255,255,255,0.7)_inset,0_24px_60px_-12px_rgba(15,23,42,0.30),0_0_0_1px_rgba(15,23,42,0.04)]">
+            {/* Chrome */}
+            <div className="flex items-center justify-between border-b border-zinc-200/70 bg-gradient-to-b from-zinc-50 to-white px-4 py-2.5">
+              <div className="flex items-center gap-1.5">
+                <span className="size-2.5 rounded-full bg-zinc-300" />
+                <span className="size-2.5 rounded-full bg-zinc-300" />
+                <span className="size-2.5 rounded-full bg-zinc-300" />
+              </div>
+              <div className="flex items-center gap-1.5 rounded-md bg-white px-3 py-1 text-[11px] font-mono text-zinc-500 ring-1 ring-inset ring-zinc-200">
+                <Icon d={IC.shield} size={10} className="text-emerald-600"/>
+                acme-prod.deck.cloud/overview
+              </div>
+              <div className="w-[80px]"/>
+            </div>
+
+            <div className="grid grid-cols-12">
+              {/* Sidebar */}
+              <div className="col-span-3 hidden bg-gradient-to-b from-zinc-950 to-zinc-900 lg:block relative overflow-hidden">
+                <div className="absolute inset-x-0 top-0 h-32" style={{ background: "radial-gradient(60% 80% at 30% 0%, rgba(99,102,241,0.28) 0%, transparent 70%)" }} />
+                <div className="relative p-5">
+                  <Logo size="sm" variant="dark"/>
+                  <div className="mt-5 flex gap-1.5 text-[10.5px] font-mono">
+                    <span className="rounded-full bg-white/[0.06] px-2 py-0.5 text-zinc-300 ring-1 ring-white/10">acme-prod</span>
+                    <span className="rounded-full bg-indigo-500/15 px-2 py-0.5 text-indigo-200 ring-1 ring-indigo-400/25">production</span>
+                  </div>
+                  <p className="mt-6 mb-2.5 px-1 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-zinc-600">Operations</p>
+                  <div className="space-y-0.5 text-[12.5px]">
+                    {[{ label: "Overview", active: true }, { label: "Jobs", count: "42" }, { label: "Activity", dot: true }, { label: "Workers" }].map((it) => (
+                      <div key={it.label} className={`relative flex items-center justify-between gap-2 rounded-md px-2 py-1.5 font-medium ${it.active ? "bg-gradient-to-r from-indigo-500/[0.18] via-indigo-500/[0.10] to-transparent text-white ring-1 ring-inset ring-indigo-400/20" : "text-zinc-400"}`}>
+                        {it.active && <span className="absolute left-0 top-1/2 h-3 w-[2px] -translate-y-1/2 rounded-r bg-indigo-400" style={{ boxShadow: "0 0 8px rgba(129,140,248,0.6)" }}/>}
+                        <span>{it.label}</span>
+                        {it.count && <span className="rounded bg-white/[0.06] px-1.5 py-0.5 font-mono text-[9.5px] text-zinc-400 ring-1 ring-white/10">{it.count}</span>}
+                        {it.dot && <span className="size-1.5 rounded-full bg-rose-500" style={{ boxShadow: "0 0 6px rgba(244,63,94,0.6)" }}/>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Main panel */}
+              <div className="col-span-12 lg:col-span-9 bg-gradient-to-b from-zinc-50/40 to-white p-5 lg:p-7 space-y-5">
+                <div className="flex items-end justify-between gap-3">
+                  <div>
+                    <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-indigo-600">Overview · 24h</p>
+                    <h3 className="mt-1.5 text-[22px] font-semibold tracking-[-0.022em] text-zinc-900 leading-tight">Operations at a glance</h3>
+                  </div>
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold text-emerald-800 ring-1 ring-inset ring-emerald-600/20">
+                    <span className="relative inline-flex size-1.5">
+                      <span className="absolute inset-0 animate-ping-slow rounded-full bg-emerald-500 opacity-70" />
+                      <span className="relative size-1.5 rounded-full bg-emerald-500" />
+                    </span>
+                    Live
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+                  {[
+                    { label: "Running",    value: "6",   color: "text-zinc-900",    note: "active now" },
+                    { label: "Failed 24h", value: "2",   color: "text-rose-600",    note: "+1 vs prev" },
+                    { label: "Pressure",   value: "48",  color: "text-amber-700",   note: "Moderate" },
+                    { label: "Throughput", value: "410", color: "text-emerald-600", note: "/min" },
+                  ].map((s) => (
+                    <div key={s.label} className="rounded-xl border border-zinc-200/70 bg-white px-4 py-3 shadow-[0_1px_0_rgba(255,255,255,0.7)_inset,0_1px_2px_rgba(15,23,42,0.04)]">
+                      <p className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.10em] text-zinc-500">{s.label}</p>
+                      <p className={`mt-1.5 text-[22px] font-semibold tabular-nums tracking-[-0.02em] leading-none ${s.color}`}>{s.value}</p>
+                      <p className="mt-1 text-[10.5px] text-zinc-500">{s.note}</p>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Chart */}
+                <div className="overflow-hidden rounded-xl border border-zinc-200/70 bg-white p-4 shadow-[0_1px_0_rgba(255,255,255,0.7)_inset,0_1px_2px_rgba(15,23,42,0.04)]">
+                  <div className="flex items-center justify-between mb-3">
+                    <div>
+                      <h4 className="text-[13px] font-semibold tracking-[-0.01em] text-zinc-900">Job volume</h4>
+                      <p className="mt-0.5 text-[11px] text-zinc-500">Executions per hour · last 24h</p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="text-right">
+                        <p className="font-mono text-[9.5px] uppercase tracking-[0.08em] text-zinc-400">Total</p>
+                        <p className="font-mono font-semibold tabular-nums text-zinc-900">1,184</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-mono text-[9.5px] uppercase tracking-[0.08em] text-zinc-400">Trend</p>
+                        <p className="font-mono font-semibold tabular-nums text-emerald-600">↑ 12%</p>
+                      </div>
+                    </div>
+                  </div>
+                  <SparkChart values={JOB_VOLUME} />
+                </div>
+
+                {/* Mini failures table */}
+                <div className="overflow-hidden rounded-xl border border-zinc-200/70 bg-white shadow-[0_1px_0_rgba(255,255,255,0.7)_inset,0_1px_2px_rgba(15,23,42,0.04)]">
+                  <div className="border-b border-zinc-100 bg-zinc-50/60 px-4 py-2 flex items-center justify-between">
+                    <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.10em] text-zinc-500">Recent failures</p>
+                    <span className="text-[11px] text-indigo-600 font-medium">View all →</span>
+                  </div>
+                  <div className="divide-y divide-zinc-100">
+                    {[
+                      { name: "SyncInventory",  err: "QueryException: deadlock detected on UPDATE", q: "default",  t: "7m ago" },
+                      { name: "WebhookDispatch", err: "ConnectException: timeout after 30s",          q: "webhooks", t: "28m ago" },
+                    ].map((r) => (
+                      <div key={r.name} className="group relative flex items-center gap-3 px-4 py-3 hover:bg-indigo-50/30">
+                        <span className="absolute left-0 top-0 h-full w-[2px] bg-indigo-500 opacity-0 group-hover:opacity-100"/>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="text-[13px] font-semibold text-zinc-900">{r.name}</span>
+                            <span className="inline-flex items-center gap-1.5 rounded bg-rose-50 px-1.5 py-0.5 text-[10.5px] font-medium text-rose-700 ring-1 ring-inset ring-rose-600/15">
+                              <span className="size-1.5 rounded-full bg-rose-500"/>failed
+                            </span>
+                          </div>
+                          <p className="mt-1 font-mono text-[11px] text-rose-700 truncate">{r.err}</p>
+                        </div>
+                        <div className="text-right shrink-0">
+                          <p className="text-[12px] text-zinc-700">{r.q}</p>
+                          <p className="mt-0.5 font-mono text-[10.5px] text-zinc-500">{r.t}</p>
+                        </div>
+                        <span className="text-[12px] font-semibold text-indigo-600 shrink-0">Retry</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function SparkChart({ values }) {
+      const W = 600, H = 90, PT = 8, PB = 10;
+      const max = Math.max(...values, 1);
+      const xs = (i) => i * (W / (values.length - 1));
+      const ys = (v) => H - PB - (v / max) * (H - PT - PB);
+      const pts = values.map((v, i) => [xs(i), ys(v)]);
+      const line = pts.reduce((a, [x, y], i) => {
+        if (i === 0) return `M ${x.toFixed(1)} ${y.toFixed(1)}`;
+        const [px, py] = pts[i - 1];
+        const cx = (px + x) / 2;
+        return `${a} C ${cx.toFixed(1)} ${py.toFixed(1)},${cx.toFixed(1)} ${y.toFixed(1)},${x.toFixed(1)} ${y.toFixed(1)}`;
+      }, "");
+      const area = `${line} L ${pts[pts.length-1][0]} ${H} L ${pts[0][0]} ${H} Z`;
+      return (
+        <svg viewBox={`0 0 ${W} ${H}`} className="w-full" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="fill-grad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#6366f1" stopOpacity="0.30"/>
+              <stop offset="100%" stopColor="#6366f1" stopOpacity="0"/>
+            </linearGradient>
+          </defs>
+          <path d={area} fill="url(#fill-grad)"/>
+          <path d={line} fill="none" stroke="#6366f1" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      );
+    }
+
+    // ────────────────────────────────────────────── compare ──────
+    function Comparison() {
+      const rows = [
+        ["Worker supervision and balancing",       true,  false],
+        ["Recent jobs (short Redis retention)",    true,  false],
+        ["Throughput and wait-time metrics",       true,  false],
+        ["Per-class last-run and history",         false, true],
+        ["Durable execution log in your database", false, true],
+        ["Search and filter by class, queue, tag", false, true],
+        ["Cooperative cancel for opt-in jobs",     false, true],
+        ["Stale-job alerts and long-running flags",false, true],
+      ];
+      return (
+        <section id="compare" className="relative py-24">
+          <div className="mx-auto max-w-[1100px] px-6">
+            <div className="mx-auto max-w-[680px] text-center">
+              <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-indigo-600 mb-3">Side-by-side</p>
+              <h2 className="text-[38px] font-semibold tracking-[-0.025em] text-zinc-950 leading-[1.1]">Keep Horizon. Add Deck.</h2>
+              <p className="mt-4 text-[16px] leading-[1.6] text-zinc-600">
+                Deck does not replace Horizon. It complements it — every line below is something
+                Horizon doesn't track, or only keeps for a few minutes.
+              </p>
+            </div>
+            <div className="mt-14 overflow-hidden rounded-2xl border border-zinc-200/70 bg-white shadow-[0_1px_0_rgba(255,255,255,0.7)_inset,0_16px_48px_-12px_rgba(15,23,42,0.10)]">
+              <div className="grid grid-cols-[1fr_130px_130px] sm:grid-cols-[1fr_170px_170px] border-b border-zinc-100 bg-zinc-50/60 px-5 py-4">
+                <div className="font-mono text-[10.5px] font-semibold uppercase tracking-[0.10em] text-zinc-500">Capability</div>
+                <div className="text-center"><p className="text-[14px] font-semibold text-zinc-900">Horizon</p><p className="mt-0.5 font-mono text-[10.5px] text-zinc-500">Runtime</p></div>
+                <div className="text-center"><p className="text-[14px] font-semibold text-indigo-600">Deck</p><p className="mt-0.5 font-mono text-[10.5px] text-zinc-500">Control plane</p></div>
+              </div>
+              <div className="divide-y divide-zinc-100">
+                {rows.map(([label, h, d]) => (
+                  <div key={label} className="grid grid-cols-[1fr_130px_130px] sm:grid-cols-[1fr_170px_170px] items-center px-5 py-3.5">
+                    <p className="text-[13.5px] text-zinc-700">{label}</p>
+                    <div className="flex justify-center">
+                      {h ? <Check tint="emerald" /> : <Cross />}
+                    </div>
+                    <div className="flex justify-center">
+                      {d ? <Check tint="indigo" glow /> : <Cross />}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+      );
+    }
+
+    function Check({ tint, glow }) {
+      const cls = tint === "indigo" ? "bg-indigo-50 text-indigo-700 ring-indigo-600/20" : "bg-emerald-50 text-emerald-700 ring-emerald-600/15";
+      return (
+        <span className={`inline-flex size-6 items-center justify-center rounded-md ring-1 ring-inset ${cls}`} style={glow ? { boxShadow: "0 0 0 4px rgba(99,102,241,0.06)" } : {}}>
+          <Icon d={IC.check} size={13} strokeWidth={2.5}/>
+        </span>
+      );
+    }
+    function Cross() {
+      return (
+        <span className="inline-flex size-6 items-center justify-center rounded-md bg-zinc-50 text-zinc-300 ring-1 ring-inset ring-zinc-200">
+          <Icon d={IC.x} size={11} strokeWidth={2.5}/>
+        </span>
+      );
+    }
+
+    // ────────────────────────────────────────────── features ─────
+    function Features() {
+      const items = [
+        { icon: IC.history, tint: "indigo",  title: "Durable execution log",   body: "Every queue dispatch lands in your database with start, finish, status, attempt count, and tags. Outlasts Redis retention by months." },
+        { icon: IC.pause,   tint: "rose",    title: "Cooperative cancel",       body: "Mark a job class Cancellable, drop a checkpoint between steps, and stop runaway work from the dashboard. No SIGTERM, no orphaned writes." },
+        { icon: IC.search,  tint: "sky",     title: "Searchable activity",      body: "Filter by class, queue, connection, tag, or paste a UUID. The whole window of history is one search bar away, not a Redis dump." },
+        { icon: IC.shield,  tint: "violet",  title: "Per-class blocking",       body: "Temporarily quiet a noisy job class for 1 hour, 24 hours, or until you say so. Workers pick the block up on the next attempt — no redeploy." },
+        { icon: IC.alert,   tint: "amber",   title: "Stale-job alerts",         body: "Subscribe per class: alert me if SyncInventory hasn't run in 24 hours. Deck checks on schedule and notifies via your existing Laravel channels." },
+        { icon: IC.cloud,   tint: "emerald", title: "Deck Cloud (soon)",        body: "One hosted dashboard for every project and environment. Every run already tags DECK_PROJECT and DECK_ENVIRONMENT — point at it and you're in.", pill: "Coming soon" },
+      ];
+      const tintCls = {
+        indigo:  "bg-indigo-50 text-indigo-700 ring-indigo-600/15",
+        rose:    "bg-rose-50 text-rose-700 ring-rose-600/15",
+        sky:     "bg-sky-50 text-sky-700 ring-sky-600/15",
+        violet:  "bg-violet-50 text-violet-700 ring-violet-600/15",
+        amber:   "bg-amber-50 text-amber-700 ring-amber-600/15",
+        emerald: "bg-emerald-50 text-emerald-700 ring-emerald-600/15",
+      };
+      return (
+        <section id="features" className="bg-gradient-to-b from-white via-zinc-50/30 to-white py-24">
+          <div className="mx-auto max-w-[1100px] px-6">
+            <div className="mx-auto max-w-[680px]">
+              <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-indigo-600 mb-3">Features</p>
+              <h2 className="text-[38px] font-semibold tracking-[-0.025em] text-zinc-950 leading-[1.1]">Built for the people on call.</h2>
+              <p className="mt-4 text-[16px] leading-[1.6] text-zinc-600">
+                Deck is opinionated about one thing: <span className="text-zinc-900 font-medium">queues need a memory</span>.
+                Every feature follows from that.
+              </p>
+            </div>
+            <div className="mt-14 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+              {items.map((f) => (
+                <div key={f.title} className="group relative overflow-hidden rounded-2xl border border-zinc-200/70 bg-white p-6 shadow-[0_1px_0_rgba(255,255,255,0.7)_inset,0_1px_2px_rgba(15,23,42,0.04)] transition hover:border-zinc-300/80 hover:shadow-[0_1px_0_rgba(255,255,255,0.7)_inset,0_12px_32px_-8px_rgba(15,23,42,0.12)]">
+                  <div className="flex items-start justify-between gap-3">
+                    <span className={`inline-flex size-10 items-center justify-center rounded-xl ring-1 ring-inset ${tintCls[f.tint]}`}>
+                      <Icon d={f.icon} size={18} strokeWidth={1.75}/>
+                    </span>
+                    {f.pill && (
+                      <span className="rounded-full bg-zinc-100 px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-[0.10em] text-zinc-600">
+                        {f.pill}
+                      </span>
+                    )}
+                  </div>
+                  <h3 className="mt-5 text-[16px] font-semibold tracking-[-0.015em] text-zinc-950">{f.title}</h3>
+                  <p className="mt-2 text-[13.5px] leading-[1.6] text-zinc-600">{f.body}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      );
+    }
+
+    // ─────────────────────────────────────────────── code ────────
+    function CodeSection() {
+      const code = [
+        { n: 1,  html: `<span style="color:#c4b5fd">use</span> TorMorten\\<span style="color:#fbbf24">Deck</span>\\Middleware\\<span style="color:#fbbf24">Cancellable</span>;` },
+        { n: 2,  html: `<span style="color:#c4b5fd">use</span> TorMorten\\<span style="color:#fbbf24">Deck</span>\\Support\\<span style="color:#fbbf24">JobCancellation</span>;` },
+        { n: 3,  html: `` },
+        { n: 4,  html: `<span style="color:#c4b5fd">class</span> <span style="color:#fbbf24">GenerateReport</span> <span style="color:#c4b5fd">implements</span> <span style="color:#fbbf24">ShouldQueue</span>` },
+        { n: 5,  html: `{` },
+        { n: 6,  html: `    <span style="color:#c4b5fd">public function</span> <span style="color:#7dd3fc">middleware</span>()<span style="color:#86efac">: array</span>` },
+        { n: 7,  html: `    {` },
+        { n: 8,  html: `        <span style="color:#c4b5fd">return</span> [<span style="color:#c4b5fd">new</span> <span style="color:#fbbf24">Cancellable</span>];` },
+        { n: 9,  html: `    }` },
+        { n: 10, html: `` },
+        { n: 11, html: `    <span style="color:#c4b5fd">public function</span> <span style="color:#7dd3fc">handle</span>()<span style="color:#86efac">: void</span>` },
+        { n: 12, html: `    {` },
+        { n: 13, html: `        <span style="color:#c4b5fd">foreach</span> (<span style="color:#f9a8d4">$this</span>-><span style="color:#7dd3fc">steps</span>() <span style="color:#c4b5fd">as</span> <span style="color:#f9a8d4">$step</span>) {` },
+        { n: 14, html: `            <span style="color:#fbbf24">JobCancellation</span>::<span style="color:#7dd3fc">throwIfCancelled</span>(<span style="color:#f9a8d4">$this</span>-><span style="color:#f9a8d4">job</span>);` },
+        { n: 15, html: `` },
+        { n: 16, html: `            <span style="color:#f9a8d4">$step</span>-><span style="color:#7dd3fc">run</span>();` },
+        { n: 17, html: `        }` },
+        { n: 18, html: `    }` },
+        { n: 19, html: `}` },
+      ];
+      return (
+        <section id="code" className="py-24">
+          <div className="mx-auto max-w-[1100px] px-6">
+            <div className="grid items-center gap-10 lg:grid-cols-2">
+              <div>
+                <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-indigo-600 mb-3">Cooperative cancel</p>
+                <h2 className="text-[38px] font-semibold tracking-[-0.025em] text-zinc-950 leading-[1.1]">
+                  One middleware.<br/>One checkpoint.<br/>You can stop the job.
+                </h2>
+                <p className="mt-5 text-[15px] leading-[1.65] text-zinc-600">
+                  Long-running jobs become safe to cancel without forced kills, orphaned writes,
+                  or "did that retry?" guessing. Deck flips a Redis flag; your job notices on the
+                  next checkpoint.
+                </p>
+                <ul className="mt-7 space-y-3 text-[14px]">
+                  {[
+                    "No SIGTERM. No process-level kills.",
+                    "Cancel a single execution by UUID — or all running runs for a class.",
+                    "Pending Redis jobs are removed before they're picked up (best effort).",
+                    "Retry still works through Horizon's failed-job store.",
+                  ].map((t) => (
+                    <li key={t} className="flex items-start gap-3 text-zinc-700">
+                      <span className="mt-0.5 inline-flex size-5 shrink-0 items-center justify-center rounded-md bg-indigo-50 text-indigo-700 ring-1 ring-inset ring-indigo-600/15">
+                        <Icon d={IC.check} size={12} strokeWidth={2.5}/>
+                      </span>
+                      <span>{t}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="relative">
+                <div className="absolute -inset-6 -z-10 rounded-[32px] bg-gradient-to-br from-indigo-500/15 via-violet-500/10 to-transparent blur-2xl"/>
+                <div className="overflow-hidden rounded-2xl border border-zinc-800 bg-[#09090b] shadow-[0_24px_48px_-12px_rgba(15,23,42,0.35)]">
+                  <div className="flex items-center justify-between border-b border-white/[0.06] bg-gradient-to-b from-zinc-900 to-zinc-900/40 px-4 py-2.5">
+                    <div className="flex items-center gap-1.5">
+                      <span className="size-2.5 rounded-full bg-zinc-700"/>
+                      <span className="size-2.5 rounded-full bg-zinc-700"/>
+                      <span className="size-2.5 rounded-full bg-zinc-700"/>
+                    </div>
+                    <p className="font-mono text-[11px] text-zinc-500">app/Jobs/GenerateReport.php</p>
+                    <div className="w-12"/>
+                  </div>
+                  <pre className="p-5 font-mono text-[12.5px] leading-[1.75] text-zinc-300 overflow-x-auto">
+                    {code.map((l) => (
+                      <div key={l.n} className="flex">
+                        <span className="select-none w-7 shrink-0 text-zinc-700 text-right pr-3">{l.n}</span>
+                        <span dangerouslySetInnerHTML={{ __html: l.html || " " }}/>
+                      </div>
+                    ))}
+                  </pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      );
+    }
+
+    // ────────────────────────────────────────────── pricing ──────
+    function Pricing() {
+      const tiers = [
+        {
+          name: "Self-hosted", tag: "Open source", price: "$0", cadence: "forever",
+          desc: "The MIT-licensed Composer package. Runs in your Laravel app, stores in your database.",
+          cta: "composer require", ctaHref: "https://github.com/tormjens/deck", style: "neutral",
+          features: ["Full dashboard at /deck", "Durable execution log in your DB", "Cooperative cancel + retry", "Stale-job alerts via your channels", "Block / unblock job classes", "Tagged for Deck Cloud"],
+          featured: false,
+        },
+        {
+          name: "Cloud Team", tag: "Deck Cloud", price: "$29", cadence: "per team / month",
+          desc: "One hosted dashboard for your whole team — unlimited projects and environments included.",
+          cta: "Join waitlist", ctaHref: "#waitlist", style: "primary",
+          features: ["Unlimited projects & environments", "Shared incident history", "Slack + email notifications", "Team roles & SSO (Google, GitHub)", "30-day execution retention", "Up to 10M executions / month", "Email support"],
+          featured: true,
+          note: "Additional executions $1 per million.",
+        },
+        {
+          name: "Cloud Enterprise", tag: "Deck Cloud", price: "Custom", cadence: "annual",
+          desc: "For teams running high-volume production fleets. Audit logs, extended retention, deployment options.",
+          cta: "Talk to us", ctaHref: "#waitlist", style: "neutral",
+          features: ["Everything in Team", "SAML SSO + SCIM", "Audit logs & access controls", "1-year execution retention", "High-volume execution limits", "Self-hosted Cloud option", "Priority support + uptime SLA"],
+          featured: false,
+        },
+      ];
+      return (
+        <section id="pricing" className="relative py-24 bg-gradient-to-b from-zinc-50/40 to-white">
+          <div className="mx-auto max-w-[1100px] px-6">
+            <div className="mx-auto max-w-[680px] text-center">
+              <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-indigo-600 mb-3">Pricing</p>
+              <h2 className="text-[38px] font-semibold tracking-[-0.025em] text-zinc-950 leading-[1.1]">Free where it runs. Paid where it scales.</h2>
+              <p className="mt-4 text-[16px] leading-[1.6] text-zinc-600">
+                The package is and always will be MIT. Deck Cloud is for teams who want one pane of glass across many apps.
+              </p>
+            </div>
+            <div className="mt-14 grid gap-5 lg:grid-cols-3">
+              {tiers.map((t) => (
+                <div key={t.name} className={`relative overflow-hidden rounded-2xl p-7 ${t.featured ? "shadow-[0_1px_0_rgba(255,255,255,0.7)_inset,0_24px_48px_-12px_rgba(79,70,229,0.18)] ring-1 ring-inset ring-indigo-300/40 bg-gradient-to-b from-white via-white to-indigo-50/30" : "border border-zinc-200/70 bg-white shadow-[0_1px_0_rgba(255,255,255,0.7)_inset,0_1px_2px_rgba(15,23,42,0.04)]"}`}>
+                  {t.featured && <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-indigo-400 to-transparent"/>}
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-[16px] font-semibold tracking-[-0.015em] text-zinc-950">{t.name}</h3>
+                    <span className={`inline-flex items-center rounded-full px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-[0.10em] ${t.featured ? "bg-indigo-50 text-indigo-700 ring-1 ring-inset ring-indigo-600/20" : "bg-zinc-100 text-zinc-600 ring-1 ring-inset ring-zinc-200"}`}>{t.tag}</span>
+                  </div>
+                  <div className="mt-5 flex items-baseline gap-2">
+                    <span className="text-[40px] font-semibold tabular-nums tracking-[-0.025em] text-zinc-950 leading-none">{t.price}</span>
+                    <span className="font-mono text-[12px] text-zinc-500">{t.cadence}</span>
+                  </div>
+                  <p className="mt-3 text-[13.5px] leading-[1.55] text-zinc-600">{t.desc}</p>
+                  <a href={t.ctaHref} className={`mt-6 flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-[13.5px] font-semibold transition ${t.style === "primary" ? "bg-zinc-900 text-white shadow-[0_1px_0_rgba(255,255,255,0.18)_inset,0_4px_12px_-2px_rgba(79,70,229,0.30)] hover:bg-zinc-800" : "bg-white text-zinc-900 ring-1 ring-inset ring-zinc-200 hover:bg-zinc-50"}`}>
+                    {t.cta === "composer require" ? <code className="font-mono">composer require</code> : t.cta}
+                    <span className="opacity-60">→</span>
+                  </a>
+                  <ul className="mt-7 space-y-2.5 text-[13px]">
+                    {t.features.map((f) => (
+                      <li key={f} className="flex items-start gap-2.5 text-zinc-700">
+                        <span className={`mt-0.5 inline-flex size-4 shrink-0 items-center justify-center rounded ${t.featured ? "bg-indigo-100 text-indigo-700" : "bg-zinc-100 text-zinc-600"}`}>
+                          <Icon d={IC.check} size={10} strokeWidth={3}/>
+                        </span>
+                        <span>{f}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  {t.note && (
+                    <p className="mt-4 text-[11.5px] text-zinc-500 font-mono">{t.note}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+            <p className="mt-10 text-center text-[12.5px] text-zinc-500">
+              Deck Cloud is in <span className="font-mono font-semibold text-zinc-700">early access</span>.
+              Pricing may shift before general availability — waitlist members get notice first.
+            </p>
+          </div>
+        </section>
+      );
+    }
+
+    // ─────────────────────────────────────────── waitlist CTA ────
+    function WaitlistCTA() {
+      const [email, setEmail] = useState("");
+      const [status, setStatus] = useState("idle"); // idle | loading | success | error
+
+      const submit = async (e) => {
+        e.preventDefault();
+        if (!email || status === "loading" || status === "success") return;
+        setStatus("loading");
+        try {
+          // ── Replace YOUR_FORM_ID below with your Formspree form ID ──
+          // Sign up free at formspree.io, create a form, and paste the ID here.
+          // Example: "xpznydkb"
+          const FORMSPREE_ID = "YOUR_FORM_ID";
+          const res = await fetch(`https://formspree.io/f/${FORMSPREE_ID}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Accept: "application/json" },
+            body: JSON.stringify({ email, _subject: "Deck Cloud waitlist" }),
+          });
+          if (res.ok) { setStatus("success"); setEmail(""); }
+          else { setStatus("error"); }
+        } catch {
+          setStatus("error");
+        }
+      };
+
+      return (
+        <section id="waitlist" className="relative overflow-hidden py-20">
+          <div className="absolute inset-0 -z-10" style={{ background: "radial-gradient(60% 80% at 50% 0%, rgba(99,102,241,0.16) 0%, transparent 70%)" }} />
+          <div className="mx-auto max-w-[900px] px-6">
+            <div className="relative overflow-hidden rounded-3xl border border-zinc-200/70 bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 px-8 py-14 sm:px-14 shadow-[0_24px_60px_-16px_rgba(15,23,42,0.40),0_0_0_1px_rgba(15,23,42,0.10)]">
+              {/* Glows */}
+              <div className="absolute -right-20 -top-20 size-[400px] rounded-full opacity-50" style={{ background: "radial-gradient(circle, rgba(99,102,241,0.35) 0%, transparent 70%)" }} />
+              <div className="absolute -left-20 -bottom-20 size-[300px] rounded-full opacity-40" style={{ background: "radial-gradient(circle, rgba(168,85,247,0.30) 0%, transparent 70%)" }} />
+              {/* Dot grid */}
+              <div className="absolute inset-0 opacity-[0.05]" style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.6) 1px, transparent 1px)", backgroundSize: "20px 20px" }} />
+
+              <div className="relative max-w-[640px]">
+                <Logo size="md" variant="dark" showLabel={false}/>
+                <h2 className="mt-6 text-[38px] font-semibold tracking-[-0.025em] text-white leading-[1.1] sm:text-[46px]">
+                  Your queues already<br/>have a memory.<br/>
+                  <span className="bg-gradient-to-r from-indigo-300 to-violet-300 bg-clip-text text-transparent">Stop forgetting.</span>
+                </h2>
+                <p className="mt-5 max-w-[480px] text-[15px] leading-[1.65] text-zinc-300">
+                  Deck Cloud is in early access. Leave your email and you'll be among the first to know when it opens — plus you lock in the launch pricing.
+                </p>
+
+                {status === "success" ? (
+                  <div className="mt-8 flex items-center gap-3 rounded-xl bg-emerald-500/15 px-5 py-4 ring-1 ring-inset ring-emerald-400/30">
+                    <span className="inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white">
+                      <Icon d={IC.check} size={16} strokeWidth={2.5}/>
+                    </span>
+                    <div>
+                      <p className="text-[14px] font-semibold text-emerald-300">You're on the list.</p>
+                      <p className="text-[13px] text-emerald-400/80">We'll reach out when Deck Cloud opens early access.</p>
+                    </div>
+                  </div>
+                ) : (
+                  <form onSubmit={submit} className="mt-8">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                      <div className="relative flex-1">
+                        <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none">
+                          <Icon d={IC.mail} size={15}/>
+                        </span>
+                        <input
+                          type="email"
+                          required
+                          placeholder="you@yourapp.com"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          className="w-full rounded-xl bg-white/[0.07] pl-10 pr-4 py-3 text-[14px] text-white placeholder-zinc-500 ring-1 ring-inset ring-white/15 focus:outline-none focus:ring-indigo-400/60 transition"
+                        />
+                      </div>
+                      <button
+                        type="submit"
+                        disabled={status === "loading"}
+                        className="group inline-flex items-center justify-center gap-2 rounded-xl bg-white px-5 py-3 text-[14px] font-semibold text-zinc-900 shadow-[0_1px_0_rgba(255,255,255,0.6)_inset,0_8px_24px_-4px_rgba(255,255,255,0.20)] hover:bg-zinc-100 disabled:opacity-70 transition whitespace-nowrap"
+                      >
+                        {status === "loading" ? "Joining…" : "Join the waitlist"}
+                        {status !== "loading" && <span className="opacity-60 transition group-hover:translate-x-0.5">→</span>}
+                      </button>
+                    </div>
+                    {status === "error" && (
+                      <p className="mt-3 text-[13px] text-rose-400">Something went wrong — try again or email us directly.</p>
+                    )}
+                    <p className="mt-3 text-[12px] text-zinc-600">No spam. Unsubscribe any time. Waitlist members get first access and launch pricing.</p>
+                  </form>
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
+      );
+    }
+
+    // ─────────────────────────────────────────────── footer ──────
+    function Footer() {
+      return (
+        <footer className="border-t border-zinc-200/60 bg-white py-12">
+          <div className="mx-auto max-w-[1100px] px-6">
+            <div className="grid gap-8 sm:grid-cols-[1.5fr_1fr_1fr_1fr]">
+              <div>
+                <Logo size="sm"/>
+                <p className="mt-4 max-w-[280px] text-[13px] leading-[1.6] text-zinc-500">
+                  Job-class observability and cooperative cancellation for Laravel apps running Horizon.
+                </p>
+                <div className="mt-5 flex items-center gap-3 text-zinc-400">
+                  <a href="https://github.com/tormjens/deck" target="_blank" rel="noopener" className="hover:text-zinc-700">
+                    <Icon d={IC.github} size={18} strokeWidth={0} className="fill-current"/>
+                  </a>
+                </div>
+              </div>
+              <FooterCol title="Product" items={[{ label: "Features", href: "#features" }, { label: "vs Horizon", href: "#compare" }, { label: "Pricing", href: "#pricing" }, { label: "Waitlist", href: "#waitlist" }]}/>
+              <FooterCol title="Resources" items={[{ label: "GitHub", href: "https://github.com/tormjens/deck" }, { label: "Packagist", href: "https://packagist.org/packages/tormjens/deck" }]}/>
+              <FooterCol title="Legal" items={[{ label: "MIT License", href: "https://github.com/tormjens/deck/blob/master/LICENSE" }]}/>
+            </div>
+            <div className="mt-12 flex flex-wrap items-center justify-between gap-3 border-t border-zinc-100 pt-6 text-[12px] text-zinc-500">
+              <p>© 2026 Deck. MIT licensed. Built by <a href="https://github.com/tormjens" className="text-zinc-700 hover:text-zinc-900">@tormjens</a>.</p>
+              <p className="font-mono"><span className="text-zinc-400">Cloud waitlist open</span></p>
+            </div>
+          </div>
+        </footer>
+      );
+    }
+
+    function FooterCol({ title, items }) {
+      return (
+        <div>
+          <p className="font-mono text-[10.5px] font-semibold uppercase tracking-[0.12em] text-zinc-500">{title}</p>
+          <ul className="mt-3 space-y-2 text-[13px]">
+            {items.map((it) => (
+              <li key={it.label}>
+                <a href={it.href} className="text-zinc-700 hover:text-zinc-900">{it.label}</a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      );
+    }
+
+    // ─────────────────────────────────────────────── app ─────────
+    function App() {
+      return (
+        <>
+          <Nav/>
+          <Hero/>
+          <Comparison/>
+          <Features/>
+          <CodeSection/>
+          <Pricing/>
+          <WaitlistCTA/>
+          <Footer/>
+        </>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+  </script>
+</body>
+</html>
