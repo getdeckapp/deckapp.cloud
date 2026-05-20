@@ -611,7 +611,7 @@
           name: "Cloud Team", tag: "Deck Cloud", price: "$29", cadence: "per team / month",
           desc: "One hosted dashboard for your whole team — unlimited projects and environments included.",
           cta: "Join waitlist", ctaHref: "#waitlist", style: "primary",
-          features: ["Unlimited projects & environments", "Shared incident history", "Slack + email notifications", "Team roles & SSO (Google, GitHub)", "30-day execution retention", "Up to 10M executions / month", "Email support"],
+          features: ["Unlimited projects & environments", "Shared incident history", "Slack + email notifications", "Team roles & SSO (Google, GitHub)", "30-day execution retention", { label: "Up to 10M executions / month", hint: "Most teams use 1–3M / month." }, "Email support"],
           featured: true,
           note: "Additional executions $1 per million.",
         },
@@ -651,14 +651,21 @@
                     <span className="opacity-60">→</span>
                   </a>
                   <ul className="mt-7 space-y-2.5 text-[13px]">
-                    {t.features.map((f) => (
-                      <li key={f} className="flex items-start gap-2.5 text-zinc-700">
-                        <span className={`mt-0.5 inline-flex size-4 shrink-0 items-center justify-center rounded ${t.featured ? "bg-indigo-100 text-indigo-700" : "bg-zinc-100 text-zinc-600"}`}>
-                          <Icon d={IC.check} size={10} strokeWidth={3}/>
-                        </span>
-                        <span>{f}</span>
-                      </li>
-                    ))}
+                    {t.features.map((f) => {
+                      const label = typeof f === "string" ? f : f.label;
+                      const hint  = typeof f === "string" ? null : f.hint;
+                      return (
+                        <li key={label} className="flex items-start gap-2.5 text-zinc-700">
+                          <span className={`mt-0.5 inline-flex size-4 shrink-0 items-center justify-center rounded ${t.featured ? "bg-indigo-100 text-indigo-700" : "bg-zinc-100 text-zinc-600"}`}>
+                            <Icon d={IC.check} size={10} strokeWidth={3}/>
+                          </span>
+                          <span>
+                            {label}
+                            {hint && <span className="block mt-0.5 font-mono text-[11px] text-zinc-400">{hint}</span>}
+                          </span>
+                        </li>
+                      );
+                    })}
                   </ul>
                   {t.note && (
                     <p className="mt-4 text-[11.5px] text-zinc-500 font-mono">{t.note}</p>
