@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Deck documentation</title>
-  <meta name="description" content="Documentation for the deck/deck Laravel package — installation, usage, production checklist, configuration reference, and Deck Cloud.">
+  <meta name="description" content="Deck documentation — Package (deck/deck) and Deck Cloud, documented separately. Installation, usage, production, configuration, and Cloud setup.">
   <meta property="og:title" content="Deck documentation">
   <meta property="og:description" content="Install Deck in three commands and get a durable, searchable log of every queue job.">
   <meta property="og:type" content="website">
@@ -105,26 +105,41 @@
     }
 
     // ──────────────────────────────────────── routing ────────────
+    const LEGACY_PAGE_IDS = { 'deck-cloud': 'cloud' };
+
     const DOCS_SECTIONS = [
-      { label: 'Start here', pages: [
+      { label: 'Overview', pages: [
+        { id: 'overview', label: 'Overview' },
+      ]},
+      { label: 'Package', pages: [
         { id: 'getting-started', label: 'Getting Started' },
         { id: 'horizon', label: 'Horizon & Deck' },
-      ]},
-      { label: 'Using Deck', pages: [
         { id: 'usage', label: 'Usage' },
         { id: 'production', label: 'Production' },
         { id: 'configuration', label: 'Configuration' },
       ]},
-      { label: 'Cloud', pages: [
-        { id: 'deck-cloud', label: 'Deck Cloud' },
+      { label: 'Deck Cloud', pages: [
+        { id: 'cloud', label: 'Introduction' },
+        { id: 'cloud-setup', label: 'Getting Started' },
+        { id: 'cloud-dashboard', label: 'Dashboard' },
+        { id: 'cloud-agents', label: 'Connecting Agents' },
+        { id: 'cloud-api', label: 'Agent API' },
       ]},
     ];
     const DOCS_FLAT = DOCS_SECTIONS.flatMap(s => s.pages);
 
+    function resolvePageId(id) {
+      return LEGACY_PAGE_IDS[id] ?? id;
+    }
+
     function getPageFromPath() {
-      const match = window.location.pathname.match(/^\/docs\/([^/]+)/);
-      const id = match ? match[1] : null;
-      return (id && DOCS_FLAT.find(p => p.id === id)) ? id : 'getting-started';
+      const path = window.location.pathname;
+      if (path === '/docs/' || path === '/docs') {
+        return 'overview';
+      }
+      const match = path.match(/^\/docs\/([^/]+)/);
+      const id = match ? resolvePageId(match[1]) : null;
+      return (id && DOCS_FLAT.find(p => p.id === id)) ? id : 'overview';
     }
 
     const NavCtx = createContext(() => {});
@@ -132,10 +147,11 @@
     function useDocsRouter() {
       const [page, setPage] = useState(() => {
         const stored = sessionStorage.getItem('docsPage');
-        if (stored && DOCS_FLAT.find(p => p.id === stored)) {
+        const resolvedStored = stored ? resolvePageId(stored) : null;
+        if (resolvedStored && DOCS_FLAT.find(p => p.id === resolvedStored)) {
           sessionStorage.removeItem('docsPage');
-          history.replaceState(null, '', `/docs/${stored}`);
-          return stored;
+          history.replaceState(null, '', `/docs/${resolvedStored}`);
+          return resolvedStored;
         }
         return getPageFromPath();
       });
@@ -147,8 +163,9 @@
       }, []);
 
       const navigate = (id) => {
-        history.pushState(null, '', `/docs/${id}`);
-        setPage(id);
+        const resolved = resolvePageId(id);
+        history.pushState(null, '', `/docs/${resolved}`);
+        setPage(resolved);
         window.scrollTo(0, 0);
       };
 
@@ -180,6 +197,9 @@
                 <Icon d={IC.github} size={14} strokeWidth={0} className="fill-current"/>
                 <span className="hidden sm:inline">GitHub</span>
               </a>
+              <a href="https://app.deckapp.cloud" className="hidden sm:inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[13px] font-medium text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900">
+                Open Cloud
+              </a>
               <a href="/#waitlist" className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-900 px-3 py-1.5 text-[13px] font-semibold text-white shadow-[0_1px_0_rgba(255,255,255,0.18)_inset,0_1px_2px_rgba(15,23,42,0.20)] hover:bg-zinc-800">
                 Join waitlist
                 <span className="opacity-60">→</span>
@@ -193,6 +213,14 @@
     // ──────────────────────────────────────── docs ui ────────────
     function DocH1({ children }) {
       return <h1 className="text-[30px] font-semibold tracking-[-0.025em] text-zinc-950 leading-tight">{children}</h1>;
+    }
+    function DocEyebrow({ section, page }) {
+      const sectionLabel = section === 'package' ? 'Package' : section === 'cloud' ? 'Deck Cloud' : 'Overview';
+      return (
+        <p className="mb-2 font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-indigo-600">
+          {sectionLabel}{page ? <span className="text-zinc-400"> · </span> : null}{page}
+        </p>
+      );
     }
     function DocH2({ id, children }) {
       return (
@@ -307,7 +335,7 @@
       return (
         <aside className="hidden lg:block w-56 shrink-0">
           <div className="sticky top-[72px] max-h-[calc(100vh-80px)] overflow-y-auto pb-8">
-            <a href="/docs/" onClick={e => { e.preventDefault(); navigate('getting-started'); }} className="mb-5 flex items-center gap-2 text-[13px] font-semibold text-zinc-900">
+            <a href="/docs/" onClick={e => { e.preventDefault(); navigate('overview'); }} className="mb-5 flex items-center gap-2 text-[13px] font-semibold text-zinc-900">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="text-indigo-600" aria-hidden="true">
                 <path d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"/>
               </svg>
@@ -336,28 +364,27 @@
     function DocsMobileNav({ page }) {
       const navigate = useContext(NavCtx);
       return (
-        <div className="lg:hidden mb-6 -mx-6 px-6 overflow-x-auto border-b border-zinc-200 pb-4">
-          <div className="flex gap-2">
-            {DOCS_FLAT.map(p => (
-              <a key={p.id} href={`/docs/${p.id}`}
-                onClick={e => { e.preventDefault(); navigate(p.id); }}
-                className={`shrink-0 rounded-full px-3 py-1.5 text-[12.5px] font-medium transition-colors ${page === p.id ? 'bg-indigo-600 text-white' : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'}`}>
-                {p.label}
-              </a>
-            ))}
-          </div>
+        <div className="lg:hidden mb-6 -mx-6 px-6 overflow-x-auto border-b border-zinc-200 pb-4 space-y-4">
+          {DOCS_SECTIONS.map(sec => (
+            <div key={sec.label}>
+              <p className="mb-2 font-mono text-[9.5px] font-semibold uppercase tracking-[0.14em] text-zinc-400">{sec.label}</p>
+              <div className="flex gap-2">
+                {sec.pages.map(p => (
+                  <a key={p.id} href={`/docs/${p.id}`}
+                    onClick={e => { e.preventDefault(); navigate(p.id); }}
+                    className={`shrink-0 rounded-full px-3 py-1.5 text-[12.5px] font-medium transition-colors ${page === p.id ? 'bg-indigo-600 text-white' : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'}`}>
+                    {p.label}
+                  </a>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
       );
     }
 
-    function NextStepsGrid() {
+    function DocLinkGrid({ links }) {
       const navigate = useContext(NavCtx);
-      const links = [
-        { to: 'usage', title: 'Usage', desc: 'Dashboard routes, cancel, block, retry, progress' },
-        { to: 'production', title: 'Production', desc: 'Retention, Redis, security, and scaling checklist' },
-        { to: 'configuration', title: 'Configuration', desc: 'All environment variables and config keys' },
-        { to: 'deck-cloud', title: 'Deck Cloud', desc: 'One pane of glass across every app' },
-      ];
       return (
         <div className="my-5 grid gap-3 sm:grid-cols-2">
           {links.map(link => (
@@ -370,11 +397,101 @@
       );
     }
 
+    const PACKAGE_DOC_LINKS = [
+      { to: 'getting-started', title: 'Getting Started', desc: 'Install deck/deck in three commands' },
+      { to: 'horizon', title: 'Horizon & Deck', desc: 'How Deck complements Horizon' },
+      { to: 'usage', title: 'Usage', desc: 'Dashboard, cancel, block, retry, progress' },
+      { to: 'production', title: 'Production', desc: 'Retention, Redis, security, scaling' },
+      { to: 'configuration', title: 'Configuration', desc: 'Environment variables and config keys' },
+    ];
+
+    const CLOUD_DOC_LINKS = [
+      { to: 'cloud', title: 'Introduction', desc: 'What Cloud is and how it fits with the package' },
+      { to: 'cloud-setup', title: 'Getting Started', desc: 'Waitlist, team setup, projects, and API keys' },
+      { to: 'cloud-dashboard', title: 'Dashboard', desc: 'Jobs, Activity, Workers, and remote commands' },
+      { to: 'cloud-agents', title: 'Connecting Agents', desc: 'Wire each Laravel app to Cloud' },
+      { to: 'cloud-api', title: 'Agent API', desc: 'Ingest endpoints and command polling' },
+    ];
+
+    function PackageNextSteps() {
+      return <DocLinkGrid links={PACKAGE_DOC_LINKS.filter(l => l.to !== 'getting-started')} />;
+    }
+
+    function CloudNextSteps() {
+      return <DocLinkGrid links={CLOUD_DOC_LINKS.filter(l => l.to !== 'cloud')} />;
+    }
+
+    function DocsHub() {
+      return (
+        <div className="my-8 space-y-8">
+          <div>
+            <DocH3>Package documentation</DocH3>
+            <DocP>The open-source <C>deck/deck</C> package — install in each Laravel app for local <C>/deck</C> observability and queue controls.</DocP>
+            <DocLinkGrid links={PACKAGE_DOC_LINKS} />
+          </div>
+          <div>
+            <DocH3>Deck Cloud documentation</DocH3>
+            <DocP>The hosted dashboard at <a href="https://app.deckapp.cloud" className="text-indigo-600 hover:underline">app.deckapp.cloud</a> — one pane of glass across every connected app.</DocP>
+            <DocLinkGrid links={CLOUD_DOC_LINKS} />
+          </div>
+        </div>
+      );
+    }
+
+    function NextStepsGrid() {
+      return <DocsHub />;
+    }
+
+    // ──────────────────────────────────────── page: overview ───
+    function DocsOverview() {
+      return (
+        <article className="max-w-[720px]">
+          <DocEyebrow section="overview" />
+          <DocH1>The Deck ecosystem</DocH1>
+          <DocP>Deck has two products that work together: an open-source <strong>package</strong> (<C>deck/deck</C>) you install in each Laravel app, and an optional hosted <strong>Cloud dashboard</strong> at <C>app.deckapp.cloud</C>. Documentation is split the same way — pick the track that matches what you are setting up.</DocP>
+
+          <DocH2 id="three-pieces">Three URLs</DocH2>
+          <DocTable
+            headers={["URL", "What it is"]}
+            rows={[
+              [<a href="/" className="text-indigo-600 hover:underline">deckapp.cloud</a>, "Marketing site and documentation (you are here)"],
+              [<a href="https://app.deckapp.cloud" className="text-indigo-600 hover:underline">app.deckapp.cloud</a>, "Hosted Cloud dashboard — sign in, manage teams, view all apps"],
+              [<C>/deck</C>, "Self-hosted dashboard inside each Laravel app (from the package)"],
+            ]}
+          />
+
+          <DocH2 id="architecture">How they connect</DocH2>
+          <DocCb title="">{`  Your Laravel apps                    Deck Cloud (hosted)
+  ┌─────────────────────┐              ┌──────────────────────┐
+  │ deck/deck package   │── events ──► │ app.deckapp.cloud    │
+  │ /deck dashboard     │◄─ commands ──│ Jobs · Activity ·    │
+  │ Horizon + Redis     │              │ Workers · Settings   │
+  └─────────────────────┘              └──────────────────────┘`}</DocCb>
+          <DocP>Horizon and Redis stay on your infrastructure. The package records every job locally. Cloud is optional — add an API key when you want a unified view across many apps.</DocP>
+
+          <DocH2 id="when-to-use">Which docs to read</DocH2>
+          <DocTable
+            headers={["Goal", "Start here"]}
+            rows={[
+              ["Install Deck in one Laravel app", <DocLink to="getting-started">Package → Getting Started</DocLink>],
+              ["Understand Deck vs Horizon", <DocLink to="horizon">Package → Horizon & Deck</DocLink>],
+              ["Sign up for Cloud and connect apps", <DocLink to="cloud-setup">Deck Cloud → Getting Started</DocLink>],
+              ["Configure the Cloud agent in .env", <DocLink to="cloud-agents">Deck Cloud → Connecting Agents</DocLink>],
+            ]}
+          />
+
+          <DocH2 id="docs-map">Documentation</DocH2>
+          <DocsHub />
+          <DocNavFooter page="overview" />
+        </article>
+      );
+    }
+
     // ──────────────────────────────────────── page: getting-started
     function DocsGettingStarted() {
       return (
         <article className="max-w-[720px]">
-          <p className="mb-2 font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-indigo-600">Getting Started</p>
+          <DocEyebrow section="package" page="Getting Started" />
           <DocH1>Install Deck in three commands</DocH1>
           <DocP>Deck listens to Laravel queue events and records every dispatch, completion, and failure into a durable database log. The dashboard is live at <C>/deck</C> after three commands — no code changes required for basic recording.</DocP>
 
@@ -395,6 +512,7 @@
 php artisan deck:install
 php artisan migrate`}</DocCb>
           <DocP><C>deck:install</C> publishes <C>config/deck.php</C>, migrations, and precompiled CSS to <C>public/vendor/deck</C>. Open <C>/deck</C> in your browser — the dashboard is ready immediately.</DocP>
+          <DocNote><strong>Deck does not run queue workers.</strong> Keep <C>php artisan horizon</C> or <C>php artisan queue:work</C> running — Deck only adds observability and controls on top of your existing queue.</DocNote>
 
           <DocH3>Dedicated database</DocH3>
           <DocP>Deck writes a row on every job event. On busy queues, use a separate connection to isolate load — see <DocLink to="production">Production → Dedicated database</DocLink>.</DocP>
@@ -410,12 +528,9 @@ php artisan migrate`}</DocCb>
 DECK_ENVIRONMENT=production`}</DocCb>
           <DocP>Set stable per-deployable values. The defaults (<C>APP_NAME</C> and <C>APP_ENV</C>) are often too generic on multi-app teams and cause history to collide across services.</DocP>
 
-          <DocH2 id="cloud">Deck Cloud (optional)</DocH2>
-          <DocCb title=".env">{`DECK_API_KEY=your-agent-token`}</DocCb>
-          <DocP>One hosted dashboard for every project and environment — see <DocLink to="deck-cloud">Deck Cloud</DocLink> for full setup.</DocP>
-
           <DocH2 id="next-steps">Next steps</DocH2>
-          <NextStepsGrid />
+          <PackageNextSteps />
+          <DocNote>Using Deck Cloud? That is documented separately — start at <DocLink to="cloud">Deck Cloud → Introduction</DocLink>.</DocNote>
           <DocNavFooter page="getting-started" />
         </article>
       );
@@ -425,7 +540,7 @@ DECK_ENVIRONMENT=production`}</DocCb>
     function DocsHorizon() {
       return (
         <article className="max-w-[720px]">
-          <p className="mb-2 font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-indigo-600">Horizon & Deck</p>
+          <DocEyebrow section="package" page="Horizon & Deck" />
           <DocH1>Horizon and Deck, side by side</DocH1>
           <DocP>Deck does <strong>not</strong> replace Horizon. Keep <C>php artisan horizon</C> running in production. Deck is the control plane that sits alongside it — adding a durable execution log and incident tools that Redis retention cannot provide.</DocP>
 
@@ -488,7 +603,7 @@ DECK_ENVIRONMENT=production`}</DocCb>
     function DocsUsage() {
       return (
         <article className="max-w-[720px]">
-          <p className="mb-2 font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-indigo-600">Usage</p>
+          <DocEyebrow section="package" page="Usage" />
           <DocH1>Using the dashboard</DocH1>
           <DocP>After installation, Deck listens to queue events and records starts, completions, and failures automatically. No code changes required for basic history.</DocP>
 
@@ -507,7 +622,7 @@ DECK_ENVIRONMENT=production`}</DocCb>
           <DocH2 id="cancel">Cooperative cancellation</DocH2>
           <DocP>Add the <C>Cancellable</C> middleware and call <C>throwIfCancelled()</C> at checkpoints. Deck interrupts the job cooperatively when a cancel is issued from the dashboard or via API.</DocP>
           <DocCb title="app/Jobs/GenerateReport.php">{`use Deck\\Deck\\Middleware\\Cancellable;
-use Deck\\Deck\\Support\\JobCancellation;
+use Deck\\Deck\\Cancellation\\JobCancellation;
 
 class GenerateReport implements ShouldQueue
 {
@@ -547,7 +662,7 @@ Deck::unblockClass(\\App\\Jobs\\SyncInventory::class);`}</DocCb>
           <DocP>The <strong>Retry</strong> action on a failed execution uses Horizon's failed-job store when available, then Laravel's <C>failed_jobs</C> table, then a parameterless re-dispatch as a last resort. Available from the Activity page and execution detail page.</DocP>
 
           <DocH2 id="progress">Job progress</DocH2>
-          <DocCb title="php">{`use Deck\\Deck\\Support\\JobProgress;
+          <DocCb title="php">{`use Deck\\Deck\\Recording\\JobProgress;
 
 JobProgress::update($this->job->uuid(), 45, 'Imported 450 of 1000 rows');`}</DocCb>
           <DocP>Progress is shown on the execution detail page while the job is running and cleared automatically on completion or failure.</DocP>
@@ -577,7 +692,7 @@ JobProgress::update($this->job->uuid(), 45, 'Imported 450 of 1000 rows');`}</Doc
               [<C>deck:install</C>, "Publish config, migrations, and assets"],
               [<C>deck:prune</C>, <span>Delete execution rows older than <C>retention_days</C></span>],
               [<C>deck:check-alerts</C>, "Evaluate stale-job and unprocessed-queue rules"],
-              [<C>deck:report-workers</C>, "Push worker snapshots to Deck Cloud (no-op when disabled)"],
+              [<C>deck:report-workers</C>, <span>Push worker snapshots when Cloud agent is enabled — see <DocLink to="cloud-agents">Connecting Agents</DocLink></span>],
             ]}
           />
           <DocNavFooter page="usage" />
@@ -589,7 +704,7 @@ JobProgress::update($this->job->uuid(), 45, 'Imported 450 of 1000 rows');`}</Doc
     function DocsProduction() {
       return (
         <article className="max-w-[720px]">
-          <p className="mb-2 font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-indigo-600">Production</p>
+          <DocEyebrow section="package" page="Production" />
           <DocH1>Production checklist</DocH1>
           <DocP>Deck appends a row on every job start, completion, and failure. The following checklist keeps it fast and secure on busy queues.</DocP>
 
@@ -663,7 +778,7 @@ DECK_BLOCK_CACHE_STORE=redis`}</DocCb>
             rows={[
               [<C>deck:prune</C>, "Daily", "Remove old execution history"],
               [<C>deck:check-alerts</C>, "Hourly (when enabled)", "Stale jobs and unprocessed queues"],
-              [<C>deck:report-workers</C>, "Optional", "Push workers to Deck Cloud"],
+              [<C>deck:report-workers</C>, "Optional", <span>Push workers to Cloud — see <DocLink to="cloud-agents">Connecting Agents</DocLink></span>],
             ]}
           />
 
@@ -698,7 +813,7 @@ DECK_BLOCK_CACHE_STORE=redis`}</DocCb>
     function DocsConfiguration() {
       return (
         <article className="max-w-[800px]">
-          <p className="mb-2 font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-indigo-600">Configuration</p>
+          <DocEyebrow section="package" page="Configuration" />
           <DocH1>Configuration reference</DocH1>
           <DocP>Publish <C>config/deck.php</C> with <C>php artisan deck:install</C>. Most settings have an environment variable equivalent listed here.</DocP>
 
@@ -740,25 +855,25 @@ DECK_BLOCK_CACHE_STORE=redis`}</DocCb>
               [<C>horizon.*</C>, "Prompt, banner, and remember-choice settings"],
               [<C>poll.*</C>, "Livewire polling intervals in seconds"],
               [<C>tables.*</C>, "Table names if customized"],
-              [<C>cloud.*</C>, <span>Deck Cloud agent — see <DocLink to="deck-cloud">Deck Cloud</DocLink></span>],
             ]}
           />
+          <DocNote>Cloud agent settings (<C>cloud.*</C> in <C>config/deck.php</C>) are documented under <DocLink to="cloud-agents">Deck Cloud → Connecting Agents</DocLink>.</DocNote>
           <DocNavFooter page="configuration" />
         </article>
       );
     }
 
-    // ──────────────────────────────────────── page: deck-cloud ───
-    function DeckCloudDocs() {
+    // ──────────────────────────────────────── pages: deck cloud ──
+    function CloudIntroDocs() {
       return (
         <article className="max-w-[720px]">
-          <p className="mb-2 font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-indigo-600">Deck Cloud</p>
+          <DocEyebrow section="cloud" page="Introduction" />
           <DocH1>Deck Cloud</DocH1>
-          <DocP><strong>One operations dashboard for every Laravel app — without replacing Horizon or moving your queues.</strong> Horizon and Redis stay on your infrastructure. The <C>deck/deck</C> package is the agent; Deck Cloud is where operators manage many services from one place.</DocP>
+          <DocP><strong>One operations dashboard for every Laravel app — without replacing Horizon or moving your queues.</strong> Horizon and Redis stay on your infrastructure. The <C>deck/deck</C> package is the agent; Deck Cloud at <a href="https://app.deckapp.cloud" className="text-indigo-600 hover:underline">app.deckapp.cloud</a> is where operators manage many services from one place.</DocP>
 
           <DocH2 id="what-you-get">What you get</DocH2>
           <DocTable
-            headers={["On each app (self-hosted)", "On Deck Cloud (hosted)"]}
+            headers={["On each app (package)", "On Deck Cloud (hosted)"]}
             rows={[
               [<span><C>/deck</C> for local history and incidents</span>, "One URL for every project and environment"],
               ["Horizon for workers and throughput", "Worker snapshots and queue workload"],
@@ -776,9 +891,9 @@ DECK_BLOCK_CACHE_STORE=redis`}</DocCb>
   Each app: Horizon / Redis (unchanged)`}</DocCb>
           <ol className="my-4 space-y-3">
             {[
-              <span key="1">Install <C>deck/deck</C> in each Laravel app.</span>,
-              <span key="2">Set stable <C>DECK_PROJECT</C> and <C>DECK_ENVIRONMENT</C> per deployable.</span>,
-              <span key="3">Add a <strong>Deck Cloud API key</strong> — the agent enables automatically.</span>,
+              <span key="1">Install <C>deck/deck</C> in each Laravel app — see <DocLink to="getting-started">Package → Getting Started</DocLink>.</span>,
+              <span key="2">Create a Cloud team, project, environment, and API key — <DocLink to="cloud-setup">Getting Started</DocLink>.</span>,
+              <span key="3">Add the agent env vars to each app — <DocLink to="cloud-agents">Connecting Agents</DocLink>.</span>,
               "Open Cloud, filter by project and environment, and act on queues from one place.",
             ].map((item, i) => (
               <li key={i} className="flex items-start gap-3 text-[14px] leading-[1.65] text-zinc-600">
@@ -787,20 +902,111 @@ DECK_BLOCK_CACHE_STORE=redis`}</DocCb>
               </li>
             ))}
           </ol>
-          <DocP>The in-app dashboard shows a <strong>Cloud connection</strong> indicator when linked. Remote commands use the same primitives as local operations: cooperative cancel, block class, cancel pending, and more.</DocP>
+          <DocP>The in-app <C>/deck</C> dashboard shows a <strong>Cloud connection</strong> indicator when linked. Remote commands use the same primitives as local operations: cooperative cancel, block class, cancel pending, and more.</DocP>
 
-          <DocH2 id="connect">Connect an app</DocH2>
+          <DocH2 id="next-steps">Next steps</DocH2>
+          <CloudNextSteps />
+          <DocNavFooter page="cloud" />
+        </article>
+      );
+    }
+
+    function CloudSetupDocs() {
+      return (
+        <article className="max-w-[720px]">
+          <DocEyebrow section="cloud" page="Getting Started" />
+          <DocH1>Set up Deck Cloud</DocH1>
+          <DocP>Deck Cloud is in early access. You need a Cloud account and API key before connecting Laravel apps. The package must already be installed in each app — see <DocLink to="getting-started">Package → Getting Started</DocLink> first.</DocP>
+
+          <DocH2 id="getting-access">Getting access</DocH2>
+          <DocP><a href="/#waitlist" className="text-indigo-600 hover:underline">Join the waitlist</a> on the homepage. When your spot opens, you receive an invitation email to create a team at <a href="https://app.deckapp.cloud" className="text-indigo-600 hover:underline">app.deckapp.cloud</a>.</DocP>
+          <DocP>Already invited? Sign in and complete onboarding — Cloud walks you through the first project and environment.</DocP>
+
+          <DocH2 id="workspace">Workspace setup</DocH2>
+          <DocP>Each Cloud team maps to one billing account. Inside a team you define:</DocP>
+          <DocTable
+            headers={["Resource", "Maps to"]}
+            rows={[
+              ["Project", <C>DECK_PROJECT</C> on each agent — e.g. <C>billing-api</C>],
+              ["Environment", <C>DECK_ENVIRONMENT</C> on each agent — e.g. <C>production</C>, <C>staging</C>],
+              ["API key", <C>DECK_API_KEY</C> — one token per agent or shared across apps in the same team],
+            ]}
+          />
+          <DocP>Create these under <strong>Settings → Installation</strong> or <strong>Settings → Projects</strong>. Slugs must match exactly what you set in each app's <C>.env</C>.</DocP>
+
+          <DocH2 id="api-keys">API keys</DocH2>
+          <DocP>Generate keys at <strong>Settings → API keys</strong>. The plain token is shown <strong>once</strong> at creation — copy it into <C>DECK_API_KEY</C> on the agent immediately. Revoke and rotate keys from the same page if compromised.</DocP>
+
+          <DocH2 id="team">Team and billing</DocH2>
+          <DocP>Invite teammates at <strong>Settings → Team</strong>. Manage subscription and invoices at <strong>Settings → Billing</strong>. Cloud features require an active subscription after onboarding.</DocP>
+
+          <DocH2 id="next">Connect your apps</DocH2>
+          <DocP>With project, environment, and API key ready, add the agent variables to each Laravel app — <DocLink to="cloud-agents">Connecting Agents</DocLink>.</DocP>
+          <DocNavFooter page="cloud-setup" />
+        </article>
+      );
+    }
+
+    function CloudDashboardDocs() {
+      return (
+        <article className="max-w-[720px]">
+          <DocEyebrow section="cloud" page="Dashboard" />
+          <DocH1>The Cloud dashboard</DocH1>
+          <DocP>Once agents are connected, <a href="https://app.deckapp.cloud" className="text-indigo-600 hover:underline">app.deckapp.cloud</a> gives you a unified view across every linked Laravel app. Filter by project and environment to focus on one deployable at a time.</DocP>
+
+          <DocH2 id="pages">Pages</DocH2>
+          <DocTable
+            headers={["Page", "Purpose"]}
+            rows={[
+              ["Dashboard", "Overview metrics, recent failures, and job volume charts"],
+              ["Jobs", "Per-class stats, history, block/unblock, and correlation views"],
+              ["Activity", "Searchable execution log with cancel and retry actions"],
+              ["Workers", "Live worker snapshots and queue workload from all agents"],
+            ]}
+          />
+
+          <DocH2 id="settings">Settings</DocH2>
+          <DocTable
+            headers={["Settings page", "Purpose"]}
+            rows={[
+              ["Installation", "Step-by-step agent setup, env snippet, and connection status"],
+              ["Projects", "Manage project and environment slugs"],
+              ["API keys", "Create and revoke agent tokens"],
+              ["Team", "Invite teammates and manage roles"],
+              ["Alerts", "Cloud-side alert configuration"],
+              ["Billing", "Subscription and billing portal"],
+              ["Account", "Profile and security"],
+            ]}
+          />
+
+          <DocH2 id="remote-commands">Remote commands</DocH2>
+          <DocP>Actions you take in Cloud — cancel a running job, block a class, cancel pending jobs — are queued as commands and delivered to the matching agent on its next poll. The agent executes them using the same Redis-backed primitives as the local <C>/deck</C> dashboard.</DocP>
+          <DocP>Command types include cooperative cancel, force cancel, cancel pending, block class, unblock class, and cancel all running for a class. See <DocLink to="cloud-api">Agent API</DocLink> for the wire protocol.</DocP>
+          <DocNavFooter page="cloud-dashboard" />
+        </article>
+      );
+    }
+
+    function CloudAgentsDocs() {
+      return (
+        <article className="max-w-[720px]">
+          <DocEyebrow section="cloud" page="Connecting Agents" />
+          <DocH1>Connect Laravel apps to Cloud</DocH1>
+          <DocP>Each Laravel app with <C>deck/deck</C> installed becomes a Cloud agent when you set an API key. Complete <DocLink to="cloud-setup">Cloud setup</DocLink> first so you have matching project, environment, and token values.</DocP>
+
+          <DocH2 id="connect">Agent configuration</DocH2>
           <DocCb title=".env">{`DECK_PROJECT=billing-api
 DECK_ENVIRONMENT=production
-DECK_API_KEY=your-agent-token`}</DocCb>
-          <DocP>Those three variables are sufficient to enable worker ingest, command polling, and execution event sync.</DocP>
+DECK_API_KEY=your-agent-token
+DECK_CLOUD_URL=https://app.deckapp.cloud`}</DocCb>
+          <DocP><C>DECK_PROJECT</C> and <C>DECK_ENVIRONMENT</C> must match the slugs created in Cloud. The API key enables the agent automatically — no extra flag required unless you want to disable sync temporarily.</DocP>
 
           <DocH2 id="cloud-vars">Environment variables</DocH2>
           <DocTable
             headers={["Variable", "Default", "Purpose"]}
             rows={[
               [<C>DECK_API_KEY</C>, "—", "Agent token; enables Cloud when set"],
-              [<C>DECK_CLOUD_URL</C>, "https://deckapp.cloud", "Cloud base URL"],
+              [<C>DECK_CLOUD_URL</C>, <span><C>http://deck.test</C> (local) / <C>https://app.deckapp.cloud</C></span>, "Cloud base URL"],
               [<C>DECK_CLOUD_ENABLED</C>, "auto", <span>Set <C>false</C> to disable while keeping the key</span>],
               [<C>DECK_CLOUD_WORKERS_ENABLED</C>, "true", "Push worker snapshots"],
               [<C>DECK_CLOUD_WORKERS_INTERVAL</C>, "30", "Sync throttle in seconds"],
@@ -812,8 +1018,32 @@ DECK_API_KEY=your-agent-token`}</DocCb>
           />
           <DocNote>Set <C>DECK_CLOUD_ENABLED=false</C> to disable the agent without removing the API key.</DocNote>
 
-          <DocH2 id="agent-api">Agent API</DocH2>
-          <DocP>When enabled, the agent communicates with Deck Cloud via four endpoints:</DocP>
+          <DocH2 id="verify">Verify the connection</DocH2>
+          <DocCb title="bash">{`# With Laravel Horizon (recommended)
+php artisan horizon
+
+# Or, without Horizon:
+php artisan queue:work
+
+# Dispatch any queued job on your Laravel app.
+# Executions should appear in Cloud Activity within a few seconds.`}</DocCb>
+          <DocP>Check <strong>Settings → Installation</strong> in Cloud for connection status. The local <C>/deck</C> sidebar also shows a Cloud connection indicator when linked.</DocP>
+
+          <DocH2 id="scheduled">Scheduled sync</DocH2>
+          <DocP>The agent syncs workers and polls commands on Horizon <C>MasterSupervisorLooped</C>, throttled <C>Queue::looping</C> (when Horizon is not installed), and via <C>deck:report-workers</C> / <C>deck:poll-commands</C>. If Horizon is installed but not running, rely on the scheduled commands or run <C>deck:report-workers</C> manually.</DocP>
+          <DocNavFooter page="cloud-agents" />
+        </article>
+      );
+    }
+
+    function CloudApiDocs() {
+      return (
+        <article className="max-w-[720px]">
+          <DocEyebrow section="cloud" page="Agent API" />
+          <DocH1>Agent API</DocH1>
+          <DocP>When the Cloud agent is enabled, the package communicates with Deck Cloud over HTTPS using your API key. All endpoints live under <C>DECK_CLOUD_URL</C> (default <C>https://app.deckapp.cloud</C>).</DocP>
+
+          <DocH2 id="endpoints">Endpoints</DocH2>
           <DocTable
             headers={["Method", "Endpoint", "Purpose"]}
             rows={[
@@ -823,8 +1053,25 @@ DECK_API_KEY=your-agent-token`}</DocCb>
               ["POST", "/api/v1/ingest/events", "Batched execution events (max 100 per request)"],
             ]}
           />
-          <DocP>Sync runs on Horizon <C>MasterSupervisorLooped</C>, throttled <C>Queue::looping</C>, and <C>deck:report-workers</C>. Remote commands map to <C>requestCancelExecution</C>, <C>forceCancelExecution</C>, <C>cancelPending</C>, <C>blockClass</C>, <C>unblockClass</C>, and <C>cancelAllRunningForClass</C>.</DocP>
-          <DocNavFooter page="deck-cloud" />
+
+          <DocH2 id="events">Execution events</DocH2>
+          <DocP>Events are idempotent on <C>(uuid, attempt)</C> — status updates in place (running → completed). Re-sending the same status is a no-op duplicate. Stale <C>running</C> events after a terminal status for the same <C>(uuid, attempt)</C> are ignored.</DocP>
+
+          <DocH2 id="commands">Remote commands</DocH2>
+          <DocP>Commands pulled from Cloud map to these agent actions:</DocP>
+          <DocTable
+            headers={["Command", "Effect"]}
+            rows={[
+              [<C>requestCancelExecution</C>, "Cooperative cancel for a running job"],
+              [<C>forceCancelExecution</C>, "Force cancel flag"],
+              [<C>cancelPending</C>, "Remove pending jobs from queue"],
+              [<C>blockClass</C>, "Block a job class from dispatching"],
+              [<C>unblockClass</C>, "Remove a class block"],
+              [<C>cancelAllRunningForClass</C>, "Cancel all in-flight jobs for a class"],
+            ]}
+          />
+          <DocP>Configure sync behaviour via the variables in <DocLink to="cloud-agents">Connecting Agents</DocLink>.</DocP>
+          <DocNavFooter page="cloud-api" />
         </article>
       );
     }
@@ -832,12 +1079,17 @@ DECK_API_KEY=your-agent-token`}</DocCb>
     // ──────────────────────────────────────── layout ─────────────
     function DocsLayout({ page }) {
       const pageMap = {
+        'overview':        <DocsOverview />,
         'getting-started': <DocsGettingStarted />,
         'usage':           <DocsUsage />,
         'production':      <DocsProduction />,
         'configuration':   <DocsConfiguration />,
-        'deck-cloud':      <DeckCloudDocs />,
         'horizon':         <DocsHorizon />,
+        'cloud':           <CloudIntroDocs />,
+        'cloud-setup':     <CloudSetupDocs />,
+        'cloud-dashboard': <CloudDashboardDocs />,
+        'cloud-agents':    <CloudAgentsDocs />,
+        'cloud-api':       <CloudApiDocs />,
       };
       return (
         <div className="mx-auto max-w-[1200px] px-6 py-10 lg:py-14">
@@ -845,7 +1097,7 @@ DECK_API_KEY=your-agent-token`}</DocCb>
             <DocsSidebar page={page} />
             <div className="min-w-0 flex-1">
               <DocsMobileNav page={page} />
-              {pageMap[page] || pageMap['getting-started']}
+              {pageMap[page] || pageMap['overview']}
             </div>
           </div>
         </div>
@@ -857,7 +1109,7 @@ DECK_API_KEY=your-agent-token`}</DocCb>
       return (
         <footer className="border-t border-zinc-200/60 bg-white py-12">
           <div className="mx-auto max-w-[1100px] px-6">
-            <div className="grid gap-8 sm:grid-cols-[1.5fr_1fr_1fr_1fr]">
+            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr]">
               <div>
                 <a href="/"><Logo size="sm"/></a>
                 <p className="mt-4 max-w-[280px] text-[13px] leading-[1.6] text-zinc-500">
@@ -869,8 +1121,9 @@ DECK_API_KEY=your-agent-token`}</DocCb>
                   </a>
                 </div>
               </div>
-              <FooterCol title="Product" items={[{ label: "Features", href: "/#features" }, { label: "vs Horizon", href: "/#compare" }, { label: "Pricing", href: "/#pricing" }, { label: "Waitlist", href: "/#waitlist" }]}/>
-              <FooterCol title="Docs" items={DOCS_FLAT.map(p => ({ label: p.label, href: `/docs/${p.id}` }))}/>
+              <FooterCol title="Product" items={[{ label: "Documentation", href: "/docs/" }, { label: "Features", href: "/#features" }, { label: "vs Horizon", href: "/#compare" }, { label: "Pricing", href: "/#pricing" }, { label: "Waitlist", href: "/#waitlist" }]}/>
+              <FooterCol title="Package" items={PACKAGE_DOC_LINKS.map(p => ({ label: p.title, href: `/docs/${p.to}` }))}/>
+              <FooterCol title="Deck Cloud" items={CLOUD_DOC_LINKS.map(p => ({ label: p.title, href: `/docs/${p.to}` }))}/>
               <FooterCol title="Resources" items={[{ label: "GitHub", href: "https://github.com/getdeckapp/deck" }, { label: "Packagist", href: "https://packagist.org/packages/deck/deck" }, { label: "MIT License", href: "https://github.com/getdeckapp/deck/blob/master/LICENSE" }]}/>
             </div>
             <div className="mt-12 flex flex-wrap items-center justify-between gap-3 border-t border-zinc-100 pt-6 text-[12px] text-zinc-500">
