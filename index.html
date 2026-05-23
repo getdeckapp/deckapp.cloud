@@ -47,10 +47,15 @@
   <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
 </head>
 <body class="antialiased bg-white text-zinc-900">
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
   <div id="root"></div>
 
   <script type="text/babel">
     const { useState, useEffect, useRef } = React;
+
+    const EARLY_ACCESS_API_URL = "https://app.deckapp.cloud/api/v1/early-access";
+    const TURNSTILE_SITE_KEY = "0x4AAAAAADVDrZpOGEt_2lnP"; // Paste your Cloudflare Turnstile site key (public)
 
     // ─────────────────────────────────────────────── chart data ──
     const JOB_VOLUME = [42,38,31,26,22,20,29,47,64,73,82,91,88,95,78,64,71,68,54,49,41,36,30,28];
@@ -693,25 +698,75 @@
     function WaitlistCTA() {
       const [email, setEmail] = useState("");
       const [status, setStatus] = useState("idle"); // idle | loading | success | error
+      const [turnstileToken, setTurnstileToken] = useState("");
+      const turnstileRef = useRef(null);
+      const widgetIdRef = useRef(null);
+
+      useEffect(() => {
+        if (!TURNSTILE_SITE_KEY || !turnstileRef.current) return undefined;
+
+        const renderWidget = () => {
+          if (!window.turnstile || widgetIdRef.current !== null) return;
+          widgetIdRef.current = window.turnstile.render(turnstileRef.current, {
+            sitekey: TURNSTILE_SITE_KEY,
+            theme: "dark",
+            callback: (token) => setTurnstileToken(token),
+            "expired-callback": () => setTurnstileToken(""),
+            "error-callback": () => setTurnstileToken(""),
+          });
+        };
+
+        if (window.turnstile) {
+          renderWidget();
+          return undefined;
+        }
+
+        const interval = window.setInterval(() => {
+          if (window.turnstile) {
+            window.clearInterval(interval);
+            renderWidget();
+          }
+        }, 100);
+
+        return () => window.clearInterval(interval);
+      }, []);
+
+      const resetTurnstile = () => {
+        if (widgetIdRef.current !== null && window.turnstile) {
+          window.turnstile.reset(widgetIdRef.current);
+          setTurnstileToken("");
+        }
+      };
 
       const submit = async (e) => {
         e.preventDefault();
         if (!email || status === "loading" || status === "success") return;
+        if (TURNSTILE_SITE_KEY && !turnstileToken) {
+          setStatus("error");
+          return;
+        }
         setStatus("loading");
         try {
-          // ── Replace YOUR_FORM_ID below with your Formspree form ID ──
-          // Sign up free at formspree.io, create a form, and paste the ID here.
-          // Example: "xpznydkb"
-          const FORMSPREE_ID = "xnjrqwkg";
-          const res = await fetch(`https://formspree.io/f/${FORMSPREE_ID}`, {
+          const res = await fetch(EARLY_ACCESS_API_URL, {
             method: "POST",
             headers: { "Content-Type": "application/json", Accept: "application/json" },
-            body: JSON.stringify({ email, _subject: "Deck Cloud waitlist" }),
+            body: JSON.stringify({
+              email,
+              source: "marketing",
+              turnstile_token: turnstileToken || undefined,
+            }),
           });
-          if (res.ok) { setStatus("success"); setEmail(""); }
-          else { setStatus("error"); }
+          if (res.ok) {
+            setStatus("success");
+            setEmail("");
+            resetTurnstile();
+          } else {
+            setStatus("error");
+            resetTurnstile();
+          }
         } catch {
           setStatus("error");
+          resetTurnstile();
         }
       };
 
@@ -743,7 +798,7 @@
                     </span>
                     <div>
                       <p className="text-[14px] font-semibold text-emerald-300">You're on the list.</p>
-                      <p className="text-[13px] text-emerald-400/80">We'll reach out when Deck Cloud opens early access.</p>
+                      <p className="text-[13px] text-emerald-400/80">We'll email you an invite when your spot opens.</p>
                     </div>
                   </div>
                 ) : (
@@ -764,13 +819,16 @@
                       </div>
                       <button
                         type="submit"
-                        disabled={status === "loading"}
+                        disabled={status === "loading" || (TURNSTILE_SITE_KEY && !turnstileToken)}
                         className="group inline-flex items-center justify-center gap-2 rounded-xl bg-white px-5 py-3 text-[14px] font-semibold text-zinc-900 shadow-[0_1px_0_rgba(255,255,255,0.6)_inset,0_8px_24px_-4px_rgba(255,255,255,0.20)] hover:bg-zinc-100 disabled:opacity-70 transition whitespace-nowrap"
                       >
                         {status === "loading" ? "Joining…" : "Join the waitlist"}
                         {status !== "loading" && <span className="opacity-60 transition group-hover:translate-x-0.5">→</span>}
                       </button>
                     </div>
+                    {TURNSTILE_SITE_KEY ? (
+                      <div ref={turnstileRef} className="mt-4" />
+                    ) : null}
                     {status === "error" && (
                       <p className="mt-3 text-[13px] text-rose-400">Something went wrong — try again or email us directly.</p>
                     )}
