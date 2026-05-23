@@ -927,9 +927,9 @@ DECK_BLOCK_CACHE_STORE=redis`}</DocCb>
           <DocTable
             headers={["Resource", "Maps to"]}
             rows={[
-              ["Project", <C>DECK_PROJECT</C> on each agent — e.g. <C>billing-api</C>],
-              ["Environment", <C>DECK_ENVIRONMENT</C> on each agent — e.g. <C>production</C>, <C>staging</C>],
-              ["API key", <C>DECK_API_KEY</C> — one token per agent or shared across apps in the same team],
+              ["Project", <span><C>DECK_PROJECT</C> on each agent — e.g. <C>billing-api</C></span>],
+              ["Environment", <span><C>DECK_ENVIRONMENT</C> on each agent — e.g. <C>production</C>, <C>staging</C></span>],
+              ["API key", <span><C>DECK_API_KEY</C> — one token per agent or shared across apps in the same team</span>],
             ]}
           />
           <DocP>Create these under <strong>Settings → Installation</strong> or <strong>Settings → Projects</strong>. Slugs must match exactly what you set in each app's <C>.env</C>.</DocP>
