@@ -1,0 +1,69 @@
+---
+const { siteTitleHref } = Astro.locals.starlightRoute;
+---
+
+<a href={siteTitleHref} class="site-title sl-flex">
+	<svg width="30" height="30" viewBox="0 0 40 40" aria-hidden="true" class="site-logo">
+		<defs>
+			<linearGradient id="docs-logo-grad" x1="0" y1="0" x2="0" y2="1">
+				<stop offset="0%" stop-color="#6366f1"></stop>
+				<stop offset="100%" stop-color="#4338ca"></stop>
+			</linearGradient>
+		</defs>
+		<rect x="6" y="11" width="22" height="22" rx="4" fill="url(#docs-logo-grad)" opacity="0.35"></rect>
+		<rect x="9" y="9" width="22" height="22" rx="4" fill="url(#docs-logo-grad)" opacity="0.6"></rect>
+		<rect x="12" y="7" width="22" height="22" rx="4" fill="url(#docs-logo-grad)"></rect>
+		<circle cx="27" cy="21" r="3.2" fill="white"></circle>
+		<circle cx="27" cy="21" r="1.4" fill="#4338ca"></circle>
+		<path d="M16 13h7" stroke="white" stroke-width="1.6" stroke-linecap="round" opacity="0.92"></path>
+		<path d="M16 17h11" stroke="white" stroke-width="1.6" stroke-linecap="round" opacity="0.7"></path>
+	</svg>
+	<div class="site-title-text">
+		<span class="site-name" translate="no">Deck</span>
+		<span class="site-tagline">Queue control plane</span>
+	</div>
+</a>
+
+<style>
+	@layer starlight.core {
+		.site-title {
+			align-items: center;
+			gap: 0.625rem;
+			text-decoration: none;
+			min-width: 0;
+			color: inherit;
+		}
+
+		.site-logo {
+			flex-shrink: 0;
+		}
+
+		.site-title-text {
+			display: flex;
+			flex-direction: column;
+			line-height: 1;
+			min-width: 0;
+		}
+
+		.site-name {
+			font-size: 0.9375rem;
+			font-weight: 600;
+			letter-spacing: -0.025em;
+			color: var(--sl-color-white);
+		}
+
+		:root[data-theme='light'] .site-name {
+			color: var(--deck-zinc-950, #18181b);
+		}
+
+		.site-tagline {
+			margin-top: 0.125rem;
+			font-family: var(--sl-font-mono);
+			font-size: 0.59375rem;
+			font-weight: 600;
+			letter-spacing: 0.14em;
+			text-transform: uppercase;
+			color: rgba(99, 102, 241, 0.75);
+		}
+	}
+</style>

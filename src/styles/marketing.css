@@ -1,0 +1,18 @@
+@import 'tailwindcss';
+
+html {
+	font-feature-settings: 'ss01', 'cv01', 'cv11';
+}
+
+body {
+	font-family: 'Inter Tight', ui-sans-serif, system-ui, sans-serif;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+.font-mono,
+code,
+pre,
+kbd {
+	font-family: 'JetBrains Mono', ui-monospace, monospace;
+}

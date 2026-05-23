@@ -1,0 +1,35 @@
+---
+import '../styles/marketing.css';
+
+const title = 'Deck — Job-class observability for Laravel';
+const description =
+	'Horizon flies the workers. Deck runs the operation — durable per-job history, cooperative cancellation, and stale-job alerts that survive past Redis retention.';
+---
+
+<!doctype html>
+<html lang="en" class="h-full scroll-smooth">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>{title}</title>
+		<meta name="description" content={description} />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:type" content="website" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+			rel="stylesheet"
+		/>
+		<script
+			src="https://www.glancelytics.com/js/cmpgx0xf3000ll804jg2oq0y9"
+			data-domain="deckapp.cloud"
+			defer></script>
+		<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+	</head>
+	<body class="antialiased bg-white text-zinc-900">
+		<slot />
+	</body>
+</html>
