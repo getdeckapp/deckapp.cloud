@@ -51,9 +51,8 @@ export default defineConfig({
 				{
 					tag: 'script',
 					attrs: {
-						src: 'https://www.glancelytics.com/js/cmpgx0xf3000ll804jg2oq0y9',
-						'data-domain': 'deckapp.cloud',
-						defer: true,
+						src: 'https://scripts.simpleanalyticscdn.com/latest.js',
+						async: true,
 					},
 				},
 			],
