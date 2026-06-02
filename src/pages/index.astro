@@ -49,8 +49,13 @@ const compareRows = [
 
 	<section class="relative overflow-hidden">
 		<div
-			class="absolute left-1/2 top-0 -z-10 h-[640px] w-[1200px] -translate-x-1/2 opacity-80"
-			style="background: radial-gradient(50% 60% at 50% 0%, rgba(99,102,241,0.22) 0%, rgba(99,102,241,0.04) 50%, transparent 80%)"
+			class="absolute inset-0 -z-10"
+			style="background-image: radial-gradient(circle, #d4d4d8 1.5px, transparent 1.5px); background-size: 22px 22px; mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 40%, transparent 100%)"
+		>
+		</div>
+		<div
+			class="absolute left-1/2 top-0 -z-10 h-[640px] w-[1200px] -translate-x-1/2 opacity-60"
+			style="background: radial-gradient(50% 60% at 50% 0%, rgba(245,158,11,0.18) 0%, rgba(245,158,11,0.03) 50%, transparent 80%)"
 		>
 		</div>
 		<div class="mx-auto max-w-[1200px] px-6 pt-16 pb-12 lg:pt-24 lg:pb-16">
@@ -59,7 +64,7 @@ const compareRows = [
 					class="mb-6 inline-flex items-center gap-2 rounded-full border border-zinc-200/80 bg-white/70 px-3 py-1 text-[12px] font-medium text-zinc-700 backdrop-blur"
 				>
 					<span
-						class="inline-flex items-center gap-1.5 rounded-full bg-indigo-50 px-2 py-0.5 font-mono text-[10.5px] font-semibold uppercase tracking-[0.10em] text-indigo-700 ring-1 ring-inset ring-indigo-600/20"
+						class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2 py-0.5 font-mono text-[10.5px] font-semibold uppercase tracking-[0.10em] text-amber-700 ring-1 ring-inset ring-amber-600/20"
 					>
 						Deck Cloud
 					</span>
@@ -67,7 +72,7 @@ const compareRows = [
 				</div>
 				<h1 class="font-semibold tracking-[-0.035em] text-zinc-950 text-[52px] leading-[1.02] sm:text-[64px] lg:text-[76px]">
 					A job silently<br />
-					<span class="bg-gradient-to-br from-indigo-600 via-indigo-500 to-violet-600 bg-clip-text text-transparent"
+					<span class="bg-gradient-to-br from-amber-600 via-amber-500 to-orange-500 bg-clip-text text-transparent"
 						>stopped running.</span
 					><br />
 					You found out from a customer.
@@ -95,7 +100,7 @@ const compareRows = [
 						class="inline-flex items-center gap-3 rounded-lg border border-zinc-200/80 bg-white/80 px-4 py-2 font-mono text-[12.5px] text-zinc-700 backdrop-blur"
 					>
 						<span class="text-zinc-400">$</span>
-						<span><span class="text-indigo-600 font-semibold">composer</span> require deck/deck</span>
+						<span><span class="text-amber-600 font-semibold">composer</span> require deck/deck</span>
 					</code>
 				</div>
 			</div>
@@ -107,7 +112,7 @@ const compareRows = [
 	<section id="compare" class="py-24">
 		<div class="mx-auto max-w-[1100px] px-6">
 			<div class="mx-auto max-w-[680px] text-center">
-				<p class="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-indigo-600 mb-3">
+				<p class="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-amber-600 mb-3">
 					Side-by-side
 				</p>
 				<h2 class="text-[38px] font-semibold tracking-[-0.025em] text-zinc-950 leading-[1.1]">
@@ -120,7 +125,7 @@ const compareRows = [
 						Capability
 					</div>
 					<div class="text-center text-[14px] font-semibold text-zinc-900">Horizon</div>
-					<div class="text-center text-[14px] font-semibold text-indigo-600">Deck</div>
+					<div class="text-center text-[14px] font-semibold text-amber-600">Deck</div>
 				</div>
 				<div class="divide-y divide-zinc-100">
 					{
@@ -128,7 +133,7 @@ const compareRows = [
 							<div class="grid grid-cols-[1fr_130px_130px] items-center px-5 py-3.5">
 								<p class="text-[13.5px] text-zinc-700">{label}</p>
 								<div class="text-center text-emerald-600">{horizon ? '✓' : '—'}</div>
-								<div class="text-center text-indigo-600">{deck ? '✓' : '—'}</div>
+								<div class="text-center text-amber-600">{deck ? '✓' : '—'}</div>
 							</div>
 						))
 					}
@@ -139,7 +144,7 @@ const compareRows = [
 
 	<section id="pricing" class="py-24 bg-zinc-50/50">
 		<div class="mx-auto max-w-[1100px] px-6 text-center">
-			<p class="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-indigo-600 mb-3">
+			<p class="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-amber-600 mb-3">
 				Pricing
 			</p>
 			<h2 class="text-[38px] font-semibold tracking-[-0.025em] text-zinc-950">Package is free. Cloud is hosted.</h2>
