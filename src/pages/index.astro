@@ -142,15 +142,125 @@ const compareRows = [
 		</div>
 	</section>
 
-	<section id="pricing" class="py-24 bg-zinc-50/50">
-		<div class="mx-auto max-w-[1100px] px-6 text-center">
-			<p class="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-amber-600 mb-3">
-				Pricing
-			</p>
-			<h2 class="text-[38px] font-semibold tracking-[-0.025em] text-zinc-950">Package is free. Cloud is hosted.</h2>
-			<p class="mx-auto mt-4 max-w-[560px] text-[16px] leading-[1.6] text-zinc-600">
-				<code class="rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-[13px]">deck/deck</code> is MIT licensed
-				and self-hosted. Deck Cloud is a subscription — waitlist members lock in launch pricing.
+	<section id="pricing" class="relative py-24 bg-gradient-to-b from-zinc-50/40 to-white">
+		<div class="mx-auto max-w-[1100px] px-6">
+			<div class="mx-auto max-w-[680px] text-center">
+				<p class="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-indigo-600 mb-3">Pricing</p>
+				<h2 class="text-[38px] font-semibold tracking-[-0.025em] text-zinc-950 leading-[1.1]">Free where it runs. Paid where it scales.</h2>
+				<p class="mt-4 text-[16px] leading-[1.6] text-zinc-600">
+					The package is and always will be MIT. Deck Cloud is for teams who want one pane of glass across many apps.
+				</p>
+			</div>
+			<div class="mt-14 grid gap-5 lg:grid-cols-3">
+
+				<!-- Self-hosted -->
+				<div class="relative overflow-hidden rounded-2xl p-7 border border-zinc-200/70 bg-white shadow-[0_1px_0_rgba(255,255,255,0.7)_inset,0_1px_2px_rgba(15,23,42,0.04)]">
+					<div class="flex items-center gap-2">
+						<h3 class="text-[16px] font-semibold tracking-[-0.015em] text-zinc-950">Self-hosted</h3>
+						<span class="inline-flex items-center rounded-full px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-[0.10em] bg-zinc-100 text-zinc-600 ring-1 ring-inset ring-zinc-200">Open source</span>
+					</div>
+					<div class="mt-5 flex items-baseline gap-2">
+						<span class="text-[40px] font-semibold tabular-nums tracking-[-0.025em] text-zinc-950 leading-none">$0</span>
+						<span class="font-mono text-[12px] text-zinc-500">forever</span>
+					</div>
+					<p class="mt-3 text-[13.5px] leading-[1.55] text-zinc-600">The MIT-licensed Composer package. Runs in your Laravel app, stores in your database.</p>
+					<a href="https://github.com/getdeckapp/deck" class="mt-6 flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-[13.5px] font-semibold transition bg-white text-zinc-900 ring-1 ring-inset ring-zinc-200 hover:bg-zinc-50">
+						<code class="font-mono">composer require</code>
+						<span class="opacity-60">→</span>
+					</a>
+					<ul class="mt-7 space-y-2.5 text-[13px]">
+						{["Full dashboard at /deck", "Durable execution log in your DB", "Cooperative cancel + retry", "Stale-job alerts via your channels", "Block / unblock job classes", "Tagged for Deck Cloud"].map((f) => (
+							<li class="flex items-start gap-2.5 text-zinc-700">
+								<span class="mt-0.5 inline-flex size-4 shrink-0 items-center justify-center rounded bg-zinc-100 text-zinc-600">
+									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="size-2.5"><polyline points="20 6 9 17 4 12"/></svg>
+								</span>
+								<span>{f}</span>
+							</li>
+						))}
+					</ul>
+				</div>
+
+				<!-- Cloud Team (featured) -->
+				<div class="relative overflow-hidden rounded-2xl p-7 shadow-[0_1px_0_rgba(255,255,255,0.7)_inset,0_24px_48px_-12px_rgba(79,70,229,0.18)] ring-1 ring-inset ring-indigo-300/40 bg-gradient-to-b from-white via-white to-indigo-50/30">
+					<div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-indigo-400 to-transparent"></div>
+					<div class="flex items-center gap-2">
+						<h3 class="text-[16px] font-semibold tracking-[-0.015em] text-zinc-950">Cloud Team</h3>
+						<span class="inline-flex items-center rounded-full px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-[0.10em] bg-indigo-50 text-indigo-700 ring-1 ring-inset ring-indigo-600/20">Deck Cloud</span>
+					</div>
+					<div class="mt-5 flex items-baseline gap-2">
+						<span class="text-[40px] font-semibold tabular-nums tracking-[-0.025em] text-zinc-950 leading-none">$29</span>
+						<span class="font-mono text-[12px] text-zinc-500">per team / month</span>
+					</div>
+					<p class="mt-3 text-[13.5px] leading-[1.55] text-zinc-600">One hosted dashboard for your whole team — unlimited projects and environments included.</p>
+					<a href="#waitlist" class="mt-6 flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-[13.5px] font-semibold transition bg-zinc-900 text-white shadow-[0_1px_0_rgba(255,255,255,0.18)_inset,0_4px_12px_-2px_rgba(79,70,229,0.30)] hover:bg-zinc-800">
+						Join waitlist
+						<span class="opacity-60">→</span>
+					</a>
+					<ul class="mt-7 space-y-2.5 text-[13px]">
+						{[
+							"Unlimited projects & environments",
+							"Shared incident history",
+							"Slack + email notifications",
+							"Team roles & SSO (Google, GitHub)",
+							"30-day execution retention",
+						].map((f) => (
+							<li class="flex items-start gap-2.5 text-zinc-700">
+								<span class="mt-0.5 inline-flex size-4 shrink-0 items-center justify-center rounded bg-indigo-100 text-indigo-700">
+									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="size-2.5"><polyline points="20 6 9 17 4 12"/></svg>
+								</span>
+								<span>{f}</span>
+							</li>
+						))}
+						<li class="flex items-start gap-2.5 text-zinc-700">
+							<span class="mt-0.5 inline-flex size-4 shrink-0 items-center justify-center rounded bg-indigo-100 text-indigo-700">
+								<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="size-2.5"><polyline points="20 6 9 17 4 12"/></svg>
+							</span>
+							<span>
+								Up to 10M executions / month
+								<span class="block mt-0.5 font-mono text-[11px] text-zinc-400">Most teams use 1–3M / month.</span>
+							</span>
+						</li>
+						<li class="flex items-start gap-2.5 text-zinc-700">
+							<span class="mt-0.5 inline-flex size-4 shrink-0 items-center justify-center rounded bg-indigo-100 text-indigo-700">
+								<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="size-2.5"><polyline points="20 6 9 17 4 12"/></svg>
+							</span>
+							<span>Email support</span>
+						</li>
+					</ul>
+					<p class="mt-4 text-[11.5px] text-zinc-500 font-mono">Additional executions $1 per million.</p>
+				</div>
+
+				<!-- Cloud Enterprise -->
+				<div class="relative overflow-hidden rounded-2xl p-7 border border-zinc-200/70 bg-white shadow-[0_1px_0_rgba(255,255,255,0.7)_inset,0_1px_2px_rgba(15,23,42,0.04)]">
+					<div class="flex items-center gap-2">
+						<h3 class="text-[16px] font-semibold tracking-[-0.015em] text-zinc-950">Cloud Enterprise</h3>
+						<span class="inline-flex items-center rounded-full px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-[0.10em] bg-zinc-100 text-zinc-600 ring-1 ring-inset ring-zinc-200">Deck Cloud</span>
+					</div>
+					<div class="mt-5 flex items-baseline gap-2">
+						<span class="text-[40px] font-semibold tabular-nums tracking-[-0.025em] text-zinc-950 leading-none">Custom</span>
+						<span class="font-mono text-[12px] text-zinc-500">annual</span>
+					</div>
+					<p class="mt-3 text-[13.5px] leading-[1.55] text-zinc-600">For teams running high-volume production fleets. Audit logs, extended retention, deployment options.</p>
+					<a href="#waitlist" class="mt-6 flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-[13.5px] font-semibold transition bg-white text-zinc-900 ring-1 ring-inset ring-zinc-200 hover:bg-zinc-50">
+						Talk to us
+						<span class="opacity-60">→</span>
+					</a>
+					<ul class="mt-7 space-y-2.5 text-[13px]">
+						{["Everything in Team", "SAML SSO + SCIM", "Audit logs & access controls", "1-year execution retention", "High-volume execution limits", "Self-hosted Cloud option", "Priority support + uptime SLA"].map((f) => (
+							<li class="flex items-start gap-2.5 text-zinc-700">
+								<span class="mt-0.5 inline-flex size-4 shrink-0 items-center justify-center rounded bg-zinc-100 text-zinc-600">
+									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="size-2.5"><polyline points="20 6 9 17 4 12"/></svg>
+								</span>
+								<span>{f}</span>
+							</li>
+						))}
+					</ul>
+				</div>
+
+			</div>
+			<p class="mt-10 text-center text-[12.5px] text-zinc-500">
+				Deck Cloud is in <span class="font-mono font-semibold text-zinc-700">early access</span>.
+				Pricing may shift before general availability — waitlist members get notice first.
 			</p>
 		</div>
 	</section>
