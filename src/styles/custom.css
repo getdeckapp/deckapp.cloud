@@ -1,13 +1,13 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 @import './docs-prose.css';
 
-/* ── Deck brand tokens (zinc + indigo) ───────────────────────── */
+/* ── Deck brand tokens (zinc + amber) ────────────────────────── */
 :root {
-	--deck-indigo-50: #eef2ff;
-	--deck-indigo-100: #e0e7ff;
-	--deck-indigo-500: #6366f1;
-	--deck-indigo-600: #4f46e5;
-	--deck-indigo-700: #4338ca;
+	--deck-amber-50: #fffbeb;
+	--deck-amber-100: #fef3c7;
+	--deck-amber-500: #f59e0b;
+	--deck-amber-600: #d97706;
+	--deck-amber-700: #b45309;
 	--deck-zinc-50: #fafafa;
 	--deck-zinc-100: #f4f4f5;
 	--deck-zinc-200: #e4e4e7;
@@ -43,18 +43,18 @@ html {
 	--sl-color-gray-7: var(--deck-zinc-50);
 	--sl-color-black: #ffffff;
 
-	--sl-color-accent-low: var(--deck-indigo-50);
-	--sl-color-accent: var(--deck-indigo-600);
-	--sl-color-accent-high: var(--deck-indigo-700);
+	--sl-color-accent-low: var(--deck-amber-50);
+	--sl-color-accent: var(--deck-amber-600);
+	--sl-color-accent-high: var(--deck-amber-700);
 
 	--sl-color-text: var(--deck-zinc-700);
-	--sl-color-text-accent: var(--deck-indigo-600);
+	--sl-color-text-accent: var(--deck-amber-600);
 	--sl-color-text-invert: #ffffff;
 	--sl-color-bg: #ffffff;
 	--sl-color-bg-nav: rgba(255, 255, 255, 0.82);
 	--sl-color-bg-sidebar: #ffffff;
 	--sl-color-bg-inline-code: var(--deck-zinc-100);
-	--sl-color-bg-accent: var(--deck-indigo-600);
+	--sl-color-bg-accent: var(--deck-amber-600);
 	--sl-color-hairline-light: var(--deck-zinc-200);
 	--sl-color-hairline: var(--deck-zinc-200);
 	--sl-color-hairline-shade: var(--deck-zinc-100);
@@ -75,18 +75,18 @@ html {
 	--sl-color-gray-6: #27272a;
 	--sl-color-black: var(--deck-zinc-950);
 
-	--sl-color-accent-low: rgba(99, 102, 241, 0.15);
-	--sl-color-accent: var(--deck-indigo-500);
-	--sl-color-accent-high: #a5b4fc;
+	--sl-color-accent-low: rgba(217, 119, 6, 0.15);
+	--sl-color-accent: var(--deck-amber-500);
+	--sl-color-accent-high: #fcd34d;
 
 	--sl-color-text: var(--sl-color-gray-2);
 	--sl-color-text-accent: var(--sl-color-accent-high);
-	--sl-color-text-invert: var(--deck-indigo-700);
+	--sl-color-text-invert: var(--deck-amber-700);
 	--sl-color-bg: var(--deck-zinc-950);
 	--sl-color-bg-nav: rgba(9, 9, 11, 0.92);
 	--sl-color-bg-sidebar: var(--deck-zinc-950);
 	--sl-color-bg-inline-code: var(--deck-zinc-800);
-	--sl-color-bg-accent: var(--sl-color-accent-high);
+	--sl-color-bg-accent: var(--deck-amber-600);
 	--sl-color-hairline-light: var(--deck-zinc-800);
 	--sl-color-hairline: var(--deck-zinc-800);
 	--sl-color-hairline-shade: #000000;
@@ -193,18 +193,18 @@ html {
 .sidebar-content a[aria-current='page'],
 .sidebar-content a[aria-current='page']:hover,
 .sidebar-content a[aria-current='page']:focus {
-	background-color: var(--deck-indigo-50) !important;
-	color: var(--deck-indigo-700) !important;
+	background-color: var(--deck-amber-50) !important;
+	color: var(--deck-amber-700) !important;
 	font-weight: 500;
-	box-shadow: inset 0 0 0 1px rgba(199, 210, 254, 0.55);
+	box-shadow: inset 0 0 0 1px rgba(253, 230, 138, 0.55);
 }
 
 :root:not([data-theme='light']) .sidebar-content a[aria-current='page'],
 :root:not([data-theme='light']) .sidebar-content a[aria-current='page']:hover,
 :root:not([data-theme='light']) .sidebar-content a[aria-current='page']:focus {
-	background-color: rgba(99, 102, 241, 0.12) !important;
-	color: #c7d2fe !important;
-	box-shadow: inset 0 0 0 1px rgba(99, 102, 241, 0.25);
+	background-color: rgba(217, 119, 6, 0.12) !important;
+	color: #fcd34d !important;
+	box-shadow: inset 0 0 0 1px rgba(217, 119, 6, 0.25);
 }
 
 site-search button {
