@@ -20,15 +20,15 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY ?? '0x4AAAAAA
 					>
 				</h2>
 				<p class="mt-5 max-w-[480px] text-[15px] leading-[1.65] text-zinc-300">
-					Deck Cloud is in early access. Leave your email and you'll be among the first to know when it
-					opens — plus you lock in the launch pricing.
+					Deck Cloud is in early access. Leave your email to get an early access invite — plus you
+					lock in the launch pricing.
 				</p>
 
 				<div id="waitlist-success" class="mt-8 hidden items-center gap-3 rounded-xl bg-emerald-500/15 px-5 py-4 ring-1 ring-inset ring-emerald-400/30">
 					<span class="inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white">✓</span>
 					<div>
-						<p class="text-[14px] font-semibold text-emerald-300">You're on the list.</p>
-						<p class="text-[13px] text-emerald-400/80">We'll email you an invite when your spot opens.</p>
+						<p class="text-[14px] font-semibold text-emerald-300">You're in.</p>
+						<p class="text-[13px] text-emerald-400/80">We'll email you an early access invite when your spot opens.</p>
 					</div>
 				</div>
 
@@ -48,7 +48,7 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY ?? '0x4AAAAAA
 							id="waitlist-submit"
 							class="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-5 py-3 text-[14px] font-semibold text-zinc-900 hover:bg-zinc-100 disabled:opacity-70 transition whitespace-nowrap"
 						>
-							Join the waitlist →
+							Get early access →
 						</button>
 					</div>
 					{turnstileSiteKey ? <div id="turnstile-widget" class="mt-4" data-sitekey={turnstileSiteKey}></div> : null}
@@ -56,7 +56,7 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY ?? '0x4AAAAAA
 						Something went wrong — try again or email us directly.
 					</p>
 					<p class="mt-3 text-[12px] text-zinc-600">
-						No spam. Unsubscribe any time. Waitlist members get first access and launch pricing.
+						No spam. Unsubscribe any time. Early access members get first access and launch pricing.
 					</p>
 				</form>
 			</div>
@@ -153,7 +153,7 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY ?? '0x4AAAAAA
 			resetTurnstile();
 		} finally {
 			submit.disabled = false;
-			submit.textContent = 'Join the waitlist →';
+			submit.textContent = 'Get early access →';
 		}
 	});
 </script>

@@ -1,13 +1,13 @@
 ---
 title: Getting Started
-description: Join the waitlist, create your Cloud team, and set up projects and API keys.
+description: Get early access, create your Cloud team, and set up projects and API keys.
 ---
 
 Deck Cloud is in early access. You need a Cloud account and API key before connecting Laravel apps. The package must already be installed in each app — see [Package → Getting Started](/package/getting-started/) first.
 
 ## Getting access
 
-[Join the waitlist](https://deckapp.cloud/#waitlist) on the homepage. When your spot opens, you receive an invitation email to create a team at [app.deckapp.cloud](https://app.deckapp.cloud).
+[Get early access](https://deckapp.cloud/#waitlist) on the homepage. When your spot opens, you receive an invitation email to create a team at [app.deckapp.cloud](https://app.deckapp.cloud).
 
 Already invited? Sign in and complete onboarding — Cloud walks you through the first project and environment.
 
