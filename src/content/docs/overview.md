@@ -50,7 +50,7 @@ The open-source `deck/deck` package — install in each Laravel app for local `/
 The hosted dashboard at [app.deckapp.cloud](https://app.deckapp.cloud) — one pane of glass across every connected app.
 
 - [Introduction](/cloud/introduction/) — what Cloud is and how it fits
-- [Getting Started](/cloud/getting-started/) — waitlist, team setup, API keys
+- [Getting Started](/cloud/getting-started/) — early access, team setup, API keys
 - [Dashboard](/cloud/dashboard/) — Jobs, Activity, Workers, remote commands
 - [Connecting Agents](/cloud/connecting-agents/) — wire each Laravel app to Cloud
 - [Agent API](/cloud/agent-api/) — ingest endpoints and command polling

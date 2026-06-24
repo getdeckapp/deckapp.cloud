@@ -36,7 +36,7 @@ The in-app `/deck` dashboard shows a **Cloud connection** indicator when linked.
 
 ## Next steps
 
-- [Getting Started](/cloud/getting-started/) — waitlist, workspace, and API keys
+- [Getting Started](/cloud/getting-started/) — early access, workspace, and API keys
 - [Dashboard](/cloud/dashboard/) — Cloud pages and remote commands
 - [Connecting Agents](/cloud/connecting-agents/) — `.env` configuration
 - [Agent API](/cloud/agent-api/) — wire protocol reference
