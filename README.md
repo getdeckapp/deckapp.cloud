@@ -36,8 +36,6 @@ npm run preview
 
 GitHub Actions (`.github/workflows/static.yml`) builds and deploys `dist/` to GitHub Pages on push to `main`.
 
-Set the `PUBLIC_TURNSTILE_SITE_KEY` repository secret for the waitlist form in CI (optional locally via `.env`).
-
 ## Editing docs
 
 - **Package docs** — edit in [getdeckapp/deck](https://github.com/getdeckapp/deck/tree/master/docs); this site syncs on build.
