@@ -3,6 +3,12 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: ['main']
+  # Fired by the upstream docs repo (getdeckapp/deck) whenever its docs
+  # change — see .github/workflows/notify-docs-site.yml over there. The
+  # build re-runs `npm run sync:package-docs`, so package docs stay current
+  # without waiting for a commit to this repo.
+  repository_dispatch:
+    types: [docs-updated]
   workflow_dispatch:
 
 permissions:
