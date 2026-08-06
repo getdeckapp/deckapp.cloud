@@ -1,0 +1,83 @@
+---
+// Deck Cloud — the hosted product. Every capability shown is real:
+// multi-project/env dashboard, shared incident history, Slack+email
+// alerts, team roles & SSO, execution retention.
+const fleet = [
+	{ project: 'acme-api', env: 'production', s: 'ok' },
+	{ project: 'billing-svc', env: 'production', s: 'ok' },
+	{ project: 'notifications', env: 'production', s: 'stale' },
+	{ project: 'worker-farm', env: 'staging', s: 'ok' },
+];
+
+const props = [
+	['Unlimited projects & environments', 'One login across every app you run — not one dashboard per repo.'],
+	['Shared incident history', "The whole team sees what happened, not just whoever's terminal was open."],
+	['Slack + email alerts', 'Get pinged the moment a job class goes quiet or runs long.'],
+	['Team roles & SSO', 'Google & GitHub sign-in, roles per project. 30-day retention.'],
+];
+---
+
+<section id="cloud" class="bg-ink c-paper on-ink">
+	<div class="mx-auto max-w-[1180px] px-5 py-20">
+		<div class="grid gap-12 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
+			<!-- copy -->
+			<div>
+				<span class="pill bg-orange c-paper border-paper" style="border-color:var(--paper)">◆ Deck Cloud</span>
+				<h2 class="display mt-6 text-[42px] c-paper sm:text-[52px]">
+					Your whole fleet.<br /><span class="c-sun">One dashboard.</span>
+				</h2>
+				<p class="mt-5 max-w-[520px] text-[17px] leading-[1.6] text-[color:var(--paper)]/80">
+					The package gives one app a memory. <span class="font-bold c-paper">Deck Cloud</span> gives
+					your team one hosted pane of glass across every app and environment — so the on-call
+					engineer sees the whole operation at a glance.
+				</p>
+
+				<div class="mt-8 grid gap-x-8 gap-y-5 sm:grid-cols-2">
+					{
+						props.map(([title, body]) => (
+							<div>
+								<p class="flex items-center gap-2 font-bold c-sun text-[15px]"><span>✓</span>{title}</p>
+								<p class="mt-1 text-[13.5px] leading-[1.5] text-[color:var(--paper)]/70">{body}</p>
+							</div>
+						))
+					}
+				</div>
+
+				<div class="mt-9 flex flex-wrap items-center gap-4">
+					<a href="https://app.deckapp.cloud/register" class="btn btn-primary">Start 7-day free trial →</a>
+					<a href="#pricing" class="btn btn-ink" style="background:transparent;color:var(--paper)">See pricing</a>
+				</div>
+			</div>
+
+			<!-- fleet card -->
+			<div class="card-b pop-orange c-ink overflow-hidden">
+				<div class="flex items-center justify-between border-b border-[color:var(--border)] bg-sun px-4 py-3 text-[13px] font-bold">
+					<span>Deck Cloud — all projects</span>
+					<span class="mono text-[12px]">5 projects · 8 envs</span>
+				</div>
+				<div class="divide-y divide-[color:var(--border)] bg-card">
+					{
+						fleet.map(({ project, env, s }) => (
+							<div class={`flex items-center justify-between gap-3 px-4 py-3.5 ${s === 'stale' ? 'bg-orange-tint' : ''}`}>
+								<div class="flex min-w-0 items-center gap-2.5">
+									<span class={`size-2.5 shrink-0 rounded-full ${s === 'stale' ? 'bg-orange' : 'bg-green'}`} />
+									<span class="truncate font-bold text-[14.5px]">{project}</span>
+									<span class="mono truncate text-[12px] c-faint">{env}</span>
+								</div>
+								{s === 'stale' ? (
+									<span class="pill bg-orange c-paper text-[11px] py-0.5">▲ stale · 5h</span>
+								) : (
+									<span class="mono text-[12px] c-green font-semibold">● healthy</span>
+								)}
+							</div>
+						))
+					}
+				</div>
+				<div class="flex items-center gap-2 border-t border-[color:var(--border)] bg-orange-tint px-4 py-3 text-[13px] font-semibold c-ink">
+					<span class="flex size-5 shrink-0 items-center justify-center rounded-full bg-orange text-[12px] font-bold text-white">!</span>
+					notifications / production idle 5h — team alerted, saved to incident history
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
