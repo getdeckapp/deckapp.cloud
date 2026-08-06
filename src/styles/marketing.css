@@ -1,18 +1,155 @@
 @import 'tailwindcss';
 
+:root {
+	/* clean neutral base with amber as the accent — close to the original */
+	--paper: #ffffff;
+	--paper-2: #fafafa;
+	--card: #ffffff;
+	--ink: #0a0a0b;
+	--ink-soft: #52525b;
+	--ink-faint: #a1a1aa;
+	--orange: #d97706; /* amber-600 — primary accent */
+	--orange-ink: #b45309; /* amber-700 */
+	--orange-tint: #fef3c7; /* amber-100 */
+	--teal: #059669; /* emerald-600 — positive / ok */
+	--teal-tint: #d1fae5; /* emerald-100 */
+	--sun: #f59e0b; /* amber-500 — bright accent, great on dark */
+	--sun-tint: #fef3c7; /* amber-100 */
+	--green: #059669;
+	--red: #dc2626;
+	--line: #0a0a0b;
+	--border: rgba(9, 9, 11, 0.1);
+	--border-strong: rgba(9, 9, 11, 0.16);
+	--border-paper: rgba(255, 255, 255, 0.2);
+}
+
 html {
-	font-feature-settings: 'ss01', 'cv01', 'cv11';
+	background: var(--paper);
+	scroll-behavior: smooth;
 }
 
 body {
-	font-family: 'Inter Tight', ui-sans-serif, system-ui, sans-serif;
+	font-family: 'Hanken Grotesk', ui-sans-serif, system-ui, sans-serif;
+	background: var(--paper);
+	color: var(--ink);
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
+	font-size: 16px;
+	line-height: 1.5;
 }
 
-.font-mono,
+.display {
+	font-family: 'Bricolage Grotesque', 'Hanken Grotesk', sans-serif;
+	font-weight: 800;
+	letter-spacing: -0.02em;
+	line-height: 0.98;
+}
+
 code,
 pre,
-kbd {
+kbd,
+.mono {
 	font-family: 'JetBrains Mono', ui-monospace, monospace;
 }
+
+::selection {
+	background: var(--orange);
+	color: #fff;
+}
+
+/* ── color helpers ───────────────────────────────── */
+.c-ink { color: var(--ink); }
+.c-soft { color: var(--ink-soft); }
+.c-faint { color: var(--ink-faint); }
+.c-orange { color: var(--orange); }
+.c-teal { color: var(--teal); }
+.c-sun { color: var(--sun); }
+.c-green { color: var(--green); }
+.c-red { color: var(--red); }
+.c-paper { color: var(--paper); }
+
+.bg-paper { background: var(--paper); }
+.bg-paper2 { background: var(--paper-2); }
+.bg-card { background: var(--card); }
+.bg-ink { background: var(--ink); }
+.bg-orange { background: var(--orange); }
+.bg-orange-tint { background: var(--orange-tint); }
+.bg-teal { background: var(--teal); }
+.bg-teal-tint { background: var(--teal-tint); }
+.bg-sun { background: var(--sun); }
+.bg-sun-tint { background: var(--sun-tint); }
+
+/* ── soft, refined surfaces: thin borders + diffuse shadows ── */
+.outline-ink { border: 1px solid var(--border-strong); }
+.pop-sm { box-shadow: 0 1px 2px rgba(36, 29, 21, 0.05), 0 4px 12px -6px rgba(36, 29, 21, 0.12); }
+.pop { box-shadow: 0 1px 3px rgba(36, 29, 21, 0.06), 0 12px 28px -12px rgba(36, 29, 21, 0.16); }
+.pop-lg { box-shadow: 0 2px 6px rgba(36, 29, 21, 0.06), 0 28px 56px -20px rgba(36, 29, 21, 0.24); }
+.pop-orange { box-shadow: 0 1px 3px rgba(36, 29, 21, 0.06), 0 18px 40px -18px rgba(238, 90, 28, 0.35); }
+
+.card-b {
+	border: 1px solid var(--border);
+	border-radius: 16px;
+	background: var(--card);
+	box-shadow: 0 1px 2px rgba(36, 29, 21, 0.04), 0 6px 18px -10px rgba(36, 29, 21, 0.12);
+}
+
+/* ── buttons ─────────────────────────────────────── */
+.btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.72rem 1.3rem;
+	font-weight: 600;
+	font-size: 15px;
+	border: 1px solid transparent;
+	border-radius: 11px;
+	transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+	box-shadow: 0 1px 2px rgba(36, 29, 21, 0.12);
+}
+.btn:hover { transform: translateY(-1px); box-shadow: 0 4px 14px -4px rgba(36, 29, 21, 0.28); }
+.btn:active { transform: translateY(0); }
+.btn-primary { background: var(--ink); color: #fff; }
+.btn-primary:hover { background: #27272a; box-shadow: 0 6px 18px -6px rgba(9, 9, 11, 0.35); }
+.btn-ink { background: var(--ink); color: var(--paper); }
+.btn-paper { background: var(--card); color: var(--ink); border-color: var(--border-strong); }
+.btn-paper:hover { background: #fafafa; }
+
+/* on dark blocks: primary becomes bright amber, secondary a ghost outline */
+.on-ink .btn-primary { background: var(--sun); color: var(--ink); }
+.on-ink .btn-primary:hover { background: #fbbf24; box-shadow: 0 6px 18px -6px rgba(245, 158, 11, 0.5); }
+.on-ink .btn-paper { background: transparent; color: var(--paper); border-color: var(--border-paper); }
+.on-ink .btn-paper:hover { background: rgba(255, 255, 255, 0.08); }
+
+/* ── pills / tags ────────────────────────────────── */
+.pill {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	padding: 0.3rem 0.72rem;
+	border-radius: 999px;
+	font-weight: 600;
+	font-size: 12.5px;
+	border: 1px solid var(--border);
+}
+
+.lnk { color: var(--ink); text-decoration: none; font-weight: 600; }
+.lnk:hover { color: var(--orange); }
+
+/* subtle paper grain / warmth via a very soft radial, no template dot-grid */
+.warm-top {
+	background:
+		radial-gradient(120% 80% at 15% -10%, var(--sun-tint) 0%, transparent 45%),
+		radial-gradient(90% 70% at 100% 0%, var(--orange-tint) 0%, transparent 40%);
+}
+
+/* ── background utilities: declared LAST so they win over .card-b/.btn ── */
+.bg-paper { background: var(--paper); }
+.bg-paper2 { background: var(--paper-2); }
+.bg-card { background: var(--card); }
+.bg-ink { background: var(--ink); }
+.bg-orange { background: var(--orange); }
+.bg-orange-tint { background: var(--orange-tint); }
+.bg-teal { background: var(--teal); }
+.bg-teal-tint { background: var(--teal-tint); }
+.bg-sun { background: var(--sun); }
+.bg-sun-tint { background: var(--sun-tint); }
