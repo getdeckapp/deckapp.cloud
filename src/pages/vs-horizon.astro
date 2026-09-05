@@ -38,7 +38,7 @@ const rows: Row[] = [
 
 const whyBoth = [
 	['Horizon flies the workers', 'Supervisors, balancing, restarts, real-time throughput. Nothing else does this for Redis queues, and Deck doesn’t try to.'],
-	['Deck remembers what they did', 'Horizon trims completed jobs after an hour and failed jobs after a week. Deck writes every execution to your database and keeps it as long as you say.'],
+	['Deck remembers what they did', 'Horizon trims completed jobs after an hour and failed jobs after a week. Deck writes the full job execution history to your database and keeps it as long as you say.'],
 	['Deck acts when Horizon can only watch', 'Cancel a running job cooperatively, block one noisy class for a day, and get an alert when a class goes silent. Horizon can retry and silence; that’s where it stops.'],
 	['Nothing changes for your workers', 'Deck listens to queue events and reuses Horizon’s authorization gate. Install it and open /deck next to /horizon.'],
 ];
