@@ -1,0 +1,184 @@
+---
+import MarketingLayout from '../layouts/MarketingLayout.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import ComparisonTable from '../components/ComparisonTable.astro';
+import MoreComparisons from '../components/MoreComparisons.astro';
+import TrialCta from '../components/TrialCta.astro';
+import type { Row } from '../data/comparisons';
+
+const title = 'Deck vs Laravel Pulse — Application Vital Signs vs Per-Job Queue History';
+const description =
+	'Deck vs Pulse for Laravel queue monitoring. Pulse shows aggregated vital signs for seven days: servers, slow requests, queries and job throughput. Deck keeps a per-job execution history in your database with cancel, block and stale-job alerts.';
+
+// Pulse facts from laravel/pulse 1.x: config `storage.trim.keep` = '7 days',
+// recorders list, SlowJobs threshold 1000ms, composer constraints.
+const rows: Row[] = [
+	['What gets recorded', 'Per-execution job records: status, attempts, duration, exception', true, 'Aggregated counts & slow-job buckets'],
+	['What gets recorded', 'Queue throughput: queued, processing, processed, released, failed', 'Per class and per queue', true],
+	['What gets recorded', 'Slow jobs over a threshold', 'Long-running flags per class', true],
+	['What gets recorded', 'Servers: CPU, memory, storage', false, true],
+	['What gets recorded', 'Slow requests, slow queries, slow outgoing HTTP, cache hit rate', false, true],
+	['What gets recorded', 'Exceptions and top users', false, true],
+	['History & search', 'Find one job by UUID, class, queue or tag', true, false],
+	['History & search', 'Per-class stats and last-run time', true, false],
+	['History & search', 'Live progress reported from inside a running job', true, false],
+	['History & search', 'Retention', 'Whatever you set; months is normal', '7 days by default'],
+	['History & search', 'Approximate values from sampling', 'Never; every execution is recorded', 'Optional, shown with ~'],
+	['Incident controls', 'Cooperative cancel of a job that is already running', 'Opt-in per class', false],
+	['Incident controls', 'Block a single job class for 1h / 24h / until you say so', true, false],
+	['Incident controls', 'Retry a failed execution from the dashboard', true, false],
+	['Incident controls', 'Clear a pending queue backlog', true, false],
+	['Alerts', '“Class X hasn’t run in 24h” alerts per job class', true, false],
+	['Alerts', 'Notifications through your Laravel channels', true, false],
+	['Team & deployment', 'Open source, MIT, self-hosted in your app', true, true],
+	['Team & deployment', 'Hosted dashboard across many apps & environments', 'Deck Cloud', false],
+	['Team & deployment', 'Dashboard requirements', 'Precompiled CSS, no Livewire or Vite', 'Livewire 3.6+ or 4'],
+	['Team & deployment', 'Storage', 'Any Laravel database connection', 'MySQL, MariaDB or PostgreSQL'],
+	['Team & deployment', 'PHP & Laravel', 'PHP 8.3+, Laravel 11–13', 'PHP 8.1+, Laravel 10.48–13'],
+];
+
+const whyDeck = [
+	['A record, not a reading', 'Pulse tells you jobs failed in the last hour. Deck tells you which job, with which payload tags, how many attempts, and what the exception was, weeks later.'],
+	['Built to act, not only to look', 'Cancel a job mid-flight, block one noisy class, retry a failure, clear a backlog. Pulse has no controls by design.'],
+	['Alerts that watch for silence', 'Pulse has no notifications. Deck pages you through your existing Laravel channels when a class hasn’t run on schedule.'],
+	['Nothing extra to run', 'Precompiled CSS, no Livewire, migrations straight from the package, any database connection. One composer require on any queue driver.'],
+	['One view across every app', 'Deck Cloud puts every project and environment on one hosted dashboard with roles and SSO. Pulse is one dashboard per app.'],
+];
+
+const whenPulse = [
+	'You want a quick, free health screen of one app: servers, slow endpoints, slow queries, exception counts.',
+	'Seven days of aggregate trends is enough and you never need to find an individual job.',
+	'Queue throughput is one card among many for you, not the thing that pages you.',
+];
+---
+
+<MarketingLayout title={title} description={description}>
+	<SiteHeader />
+
+	<!-- ═══ hero ═════════════════════════════════════════════ -->
+	<section class="warm-top">
+		<div class="mx-auto max-w-[1180px] px-5 py-16 lg:py-24">
+			<div class="max-w-[760px]">
+				<span class="pill bg-teal-tint c-teal"><span class="size-2 rounded-full bg-teal"></span>Comparison</span>
+				<h1 class="display mt-6 text-[48px] sm:text-[64px] lg:text-[72px]">
+					Deck vs Pulse:<br />
+					vital signs, or<br />
+					<span class="c-orange">the record</span>?
+				</h1>
+				<p class="mt-7 max-w-[640px] text-[18px] leading-[1.6] c-soft">
+					<span class="font-bold c-ink">Laravel Pulse</span> is a first-party health screen: CPU,
+					slow requests, slow queries, exception counts and a queue throughput chart, aggregated
+					and kept for a week. <span class="font-bold c-ink">Deck</span> keeps the record itself.
+					Every job execution, in your database, searchable for months, with the controls and
+					alerts to act on what you find. Pulse tells you the queue is unwell. Deck tells you which
+					job, and lets you do something about it.
+				</p>
+				<div class="mt-9 flex flex-wrap items-center gap-4">
+					<a href="https://app.deckapp.cloud/register" class="btn btn-primary">Start 7-day free trial →</a>
+					<a href="#compare" class="btn btn-paper">See the comparison</a>
+				</div>
+			</div>
+
+			<div class="mt-12 grid gap-6 md:grid-cols-2">
+				<div class="card-b pop-orange p-7">
+					<span class="pill bg-orange-tint c-orange-ink">Deck</span>
+					<h2 class="display mt-4 text-[26px]">A memory and a control panel for your queues.</h2>
+					<p class="mt-3 text-[15px] leading-[1.6] c-soft">
+						Deck records every dispatch on any queue driver with status, attempts, duration and tags,
+						and keeps it as long as you set. From the same dashboard you cancel a running job, quiet a
+						noisy class, retry a failure and get told when a class goes silent. Deck Cloud does the
+						same across every app your team runs.
+					</p>
+				</div>
+				<div class="card-b p-7">
+					<span class="pill bg-teal-tint c-teal">Pulse</span>
+					<h2 class="display mt-4 text-[26px]">Real-time vitals for one application.</h2>
+					<p class="mt-3 text-[15px] leading-[1.6] c-soft">
+						Pulse samples and pre-aggregates into time buckets so the dashboard stays fast: servers,
+						usage, exceptions, slow requests, slow jobs, slow queries, slow outgoing requests and cache.
+						It is free, first-party and easy to install. It has no per-job history, no alerts and no
+						controls, and it trims after seven days by default.
+					</p>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- ═══ compare ══════════════════════════════════════════ -->
+	<section id="compare" class="mx-auto max-w-[1180px] px-5 py-20">
+		<div class="max-w-[640px]">
+			<span class="pill bg-sun-tint c-ink">Side by side</span>
+			<h2 class="display mt-5 text-[40px] sm:text-[48px]">What each one does.</h2>
+			<p class="mt-4 text-[17px] leading-[1.6] c-soft">
+				A checkmark means the capability ships today. Where a plain yes or no would be misleading,
+				the cell says what actually happens. Pulse figures are its defaults.
+			</p>
+		</div>
+
+		<ComparisonTable competitor="Pulse" rows={rows} />
+
+		<div class="card-b bg-sun-tint mt-10 flex flex-col items-start gap-5 p-7 sm:flex-row sm:items-center sm:justify-between">
+			<div>
+				<p class="display text-[22px]">Keep Pulse for vitals. Add Deck for the record.</p>
+				<p class="mt-1.5 text-[14.5px] c-soft">They don’t overlap. The package is MIT; Deck Cloud is free for 7 days.</p>
+			</div>
+			<div class="flex flex-wrap items-center gap-3">
+				<a href="https://app.deckapp.cloud/register" class="btn btn-primary">Start free trial →</a>
+				<a href="/package/getting-started/" class="btn btn-paper">Install the package</a>
+			</div>
+		</div>
+	</section>
+
+	<!-- ═══ which one ════════════════════════════════════════ -->
+	<section class="bg-paper2 border-y border-[color:var(--border)]">
+		<div class="mx-auto max-w-[1180px] px-5 py-20">
+			<div class="max-w-[640px]">
+				<span class="pill bg-orange-tint c-orange-ink">The honest answer</span>
+				<h2 class="display mt-5 text-[40px] sm:text-[48px]">Different questions, different tools.</h2>
+				<p class="mt-4 text-[17px] leading-[1.6] c-soft">
+					Pulse answers “is the app healthy right now?”. Deck answers “what happened to that job, and
+					how do I stop it happening again?”. If queues are what page you, the second question is the
+					one you keep asking.
+				</p>
+			</div>
+
+			<div class="mt-12 grid gap-6 lg:grid-cols-[1.15fr_0.85fr] lg:items-start">
+				<div class="card-b pop-orange p-7">
+					<h3 class="display text-[24px]">Why teams pick Deck</h3>
+					<div class="mt-6 space-y-5">
+						{whyDeck.map(([heading, body]) => (
+							<div class="flex items-start gap-3">
+								<span class="c-orange mt-0.5 font-bold">✓</span>
+								<div>
+									<p class="font-bold text-[15.5px]">{heading}</p>
+									<p class="mt-1 text-[14.5px] leading-[1.55] c-soft">{body}</p>
+								</div>
+							</div>
+						))}
+					</div>
+				</div>
+				<div class="card-b p-7">
+					<h3 class="display text-[24px]">When Pulse is enough</h3>
+					<ul class="mt-6 space-y-3.5 text-[15px] leading-[1.55]">
+						{whenPulse.map((f) => (
+							<li class="flex items-start gap-2.5"><span class="c-teal font-bold">✓</span><span>{f}</span></li>
+						))}
+					</ul>
+					<p class="mt-6 text-[14px] leading-[1.6] c-soft">
+						Pulse is a fine default and many Deck users run it too. They just don’t ask it about
+						individual jobs.
+					</p>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<div class="pt-20">
+		<MoreComparisons current="vs-pulse" />
+	</div>
+
+	<TrialCta />
+
+	<SiteFooter />
+</MarketingLayout>

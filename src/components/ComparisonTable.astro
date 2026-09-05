@@ -1,0 +1,55 @@
+---
+import type { Row } from '../data/comparisons';
+
+interface Props {
+	competitor: string;
+	rows: Row[];
+}
+
+const { competitor, rows } = Astro.props;
+const groups = [...new Set(rows.map(([g]) => g))];
+---
+
+<div class="card-b pop mt-10 overflow-hidden">
+	<div class="overflow-x-auto">
+		<div class="min-w-[720px]">
+			<div class="grid grid-cols-[1fr_200px_200px] border-b border-[color:var(--border)] bg-paper2 px-5 py-3.5 text-[13px] font-bold uppercase tracking-wide">
+				<span>Capability</span>
+				<span class="text-center c-orange">Deck</span>
+				<span class="text-center c-teal">{competitor}</span>
+			</div>
+			{
+				groups.map((group) => (
+					<>
+						<div class="border-b border-[color:var(--border)] bg-paper2/60 px-5 py-2 text-[12px] font-bold uppercase tracking-wide c-faint">{group}</div>
+						{rows
+							.filter(([g]) => g === group)
+							.map(([, label, deck, other], i) => (
+								<div class={`grid grid-cols-[1fr_200px_200px] items-center px-5 py-3.5 text-[14.5px] ${i % 2 ? 'bg-paper2/50' : ''}`}>
+									<span class="font-medium">{label}</span>
+									<span class="px-3 text-center">
+										{deck === true ? (
+											<span class="text-[18px] font-bold c-orange">✓</span>
+										) : deck === false ? (
+											<span class="text-[18px] c-faint">–</span>
+										) : (
+											<span class="text-[12.5px] leading-[1.4] c-soft">{deck}</span>
+										)}
+									</span>
+									<span class="px-3 text-center">
+										{other === true ? (
+											<span class="text-[18px] font-bold c-teal">✓</span>
+										) : other === false ? (
+											<span class="text-[18px] c-faint">–</span>
+										) : (
+											<span class="text-[12.5px] leading-[1.4] c-soft">{other}</span>
+										)}
+									</span>
+								</div>
+							))}
+					</>
+				))
+			}
+		</div>
+	</div>
+</div>

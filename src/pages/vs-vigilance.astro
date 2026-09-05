@@ -2,18 +2,17 @@
 import MarketingLayout from '../layouts/MarketingLayout.astro';
 import SiteHeader from '../components/SiteHeader.astro';
 import SiteFooter from '../components/SiteFooter.astro';
+import ComparisonTable from '../components/ComparisonTable.astro';
+import MoreComparisons from '../components/MoreComparisons.astro';
 import TrialCta from '../components/TrialCta.astro';
+import type { Row } from '../data/comparisons';
 
 const title = 'Deck vs Vigilance — Which Laravel Queue Monitoring Tool Fits Your Team?';
 const description =
 	'Deck vs Vigilance for Laravel queue monitoring. Deck goes deep on job history, cooperative cancel, blocking and stale-job alerts on any queue driver, plus a hosted multi-app dashboard. Vigilance goes wide with all-in-one APM. See which fits.';
 
-// Each cell is `true` (✓), `false` (–) or a short note when neither is honest.
 // Vigilance details come from its public README (github.com/anousss007/laravel-vigilance)
 // as of September 2026 — keep this table factual when either project changes.
-type Cell = boolean | string;
-type Row = [group: string, label: string, deck: Cell, vigilance: Cell];
-
 const rows: Row[] = [
 	['Queue history', 'Per-execution job history in your own database', true, true],
 	['Queue history', 'Works on any Laravel queue driver (database, Redis, SQS, sync…)', true, true],
@@ -38,8 +37,6 @@ const rows: Row[] = [
 	['Beyond queues', 'Whole-app APM, trace waterfalls & Real User Monitoring', false, true],
 	['Beyond queues', 'SLOs, uptime checks, logs explorer & release health', false, true],
 ];
-
-const groups = [...new Set(rows.map(([g]) => g))];
 
 const whyDeck = [
 	['Built for the queue problem', 'A job that silently stopped. A failure nobody can find a week later. Deck is designed around exactly these incidents, and everything in it follows from that.'],
@@ -119,49 +116,8 @@ const whenVigilance = [
 			</p>
 		</div>
 
-		<div class="card-b pop mt-10 overflow-hidden">
-			<div class="overflow-x-auto">
-				<div class="min-w-[720px]">
-					<div class="grid grid-cols-[1fr_200px_200px] border-b border-[color:var(--border)] bg-paper2 px-5 py-3.5 text-[13px] font-bold uppercase tracking-wide">
-						<span>Capability</span>
-						<span class="text-center c-orange">Deck</span>
-						<span class="text-center c-teal">Vigilance</span>
-					</div>
-					{
-						groups.map((group) => (
-							<>
-								<div class="border-b border-[color:var(--border)] bg-paper2/60 px-5 py-2 text-[12px] font-bold uppercase tracking-wide c-faint">{group}</div>
-								{rows
-									.filter(([g]) => g === group)
-									.map(([, label, deck, vigilance], i) => (
-										<div class={`grid grid-cols-[1fr_200px_200px] items-center px-5 py-3.5 text-[14.5px] ${i % 2 ? 'bg-paper2/50' : ''}`}>
-											<span class="font-medium">{label}</span>
-											<span class="px-3 text-center">
-												{deck === true ? (
-													<span class="text-[18px] font-bold c-orange">✓</span>
-												) : deck === false ? (
-													<span class="text-[18px] c-faint">–</span>
-												) : (
-													<span class="text-[12.5px] leading-[1.4] c-soft">{deck}</span>
-												)}
-											</span>
-											<span class="px-3 text-center">
-												{vigilance === true ? (
-													<span class="text-[18px] font-bold c-teal">✓</span>
-												) : vigilance === false ? (
-													<span class="text-[18px] c-faint">–</span>
-												) : (
-													<span class="text-[12.5px] leading-[1.4] c-soft">{vigilance}</span>
-												)}
-											</span>
-										</div>
-									))}
-							</>
-						))
-					}
-				</div>
-			</div>
-		</div>
+		<ComparisonTable competitor="Vigilance" rows={rows} />
+
 		<p class="mt-5 text-[13px] leading-[1.6] c-faint">
 			Vigilance capabilities are taken from its
 			<a href="https://github.com/anousss007/laravel-vigilance" target="_blank" rel="noopener" class="lnk c-soft">public README</a>
@@ -237,6 +193,10 @@ const whenVigilance = [
 			</div>
 		</div>
 	</section>
+
+	<div class="pt-20">
+		<MoreComparisons current="vs-vigilance" />
+	</div>
 
 	<TrialCta />
 
