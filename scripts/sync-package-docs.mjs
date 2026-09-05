@@ -13,7 +13,7 @@ const PACKAGE_DOCS = [
 		{
 			title: 'Install Deck — Laravel Queue Monitoring Setup Guide',
 			description:
-				'Install the Deck package to add Laravel queue monitoring on any queue driver, with or without Horizon: requirements, composer install, migrations, authorization, and project identity.',
+				'Install Deck for Laravel queue monitoring on any queue driver, with or without Horizon: requirements, composer install, migrations and authorization.',
 		},
 	],
 	['horizon', 'Horizon & Deck'],
@@ -23,7 +23,7 @@ const PACKAGE_DOCS = [
 		{
 			title: 'Laravel Queue Dashboard Usage — Search, Cancel, Block Jobs',
 			description:
-				'How to use the Deck Laravel queue dashboard: search job execution history, cancel running jobs cooperatively, block job classes, retry failures, and set up stale-job alerts.',
+				'Laravel queue dashboard usage: search job execution history, cancel running jobs, block job classes, retry failures and set up stale-job alerts in Deck.',
 		},
 	],
 	['production', 'Production'],

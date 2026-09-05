@@ -9,7 +9,7 @@ import type { Row } from '../data/comparisons';
 
 const title = 'Deck vs Laravel Pulse — Application Vital Signs vs Per-Job Queue History';
 const description =
-	'Deck vs Pulse for Laravel queue monitoring. Pulse shows aggregated vital signs for seven days: servers, slow requests, queries and job throughput. Deck keeps a per-job execution history in your database with cancel, block and stale-job alerts.';
+	'Deck vs Pulse for Laravel queue monitoring: 7 days of aggregate vitals, or every job execution kept in your database with cancel, block and alerts.';
 
 // Pulse facts from laravel/pulse 1.x: config `storage.trim.keep` = '7 days',
 // recorders list, SlowJobs threshold 1000ms, composer constraints.
@@ -71,8 +71,8 @@ const whenPulse = [
 					slow requests, slow queries, exception counts and a queue throughput chart, aggregated
 					and kept for a week. <span class="font-bold c-ink">Deck</span> keeps the record itself.
 					Every job execution, in your database, searchable for months, with the controls and
-					alerts to act on what you find. Pulse tells you the queue is unwell. Deck tells you which
-					job, and lets you do something about it.
+					alerts to act on what you find. As Laravel queue monitoring goes, Pulse tells you the queue
+					is unwell. Deck tells you which job, and lets you do something about it.
 				</p>
 				<div class="mt-9 flex flex-wrap items-center gap-4">
 					<a href="https://app.deckapp.cloud/register" class="btn btn-primary">Start 7-day free trial →</a>
@@ -139,7 +139,8 @@ const whenPulse = [
 				<p class="mt-4 text-[17px] leading-[1.6] c-soft">
 					Pulse answers “is the app healthy right now?”. Deck answers “what happened to that job, and
 					how do I stop it happening again?”. If queues are what page you, the second question is the
-					one you keep asking.
+					one you keep asking. Teams searching for a Pulse alternative for their queues usually want the
+					record, not a second set of vitals. That is Deck.
 				</p>
 			</div>
 
