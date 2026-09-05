@@ -13,7 +13,7 @@ const PACKAGE_DOCS = [
 		{
 			title: 'Install Deck — Laravel Queue Monitoring Setup Guide',
 			description:
-				'Install the Deck package to add Laravel queue monitoring on top of Horizon: requirements, composer install, migrations, authorization, and project identity.',
+				'Install the Deck package to add Laravel queue monitoring on any queue driver, with or without Horizon: requirements, composer install, migrations, authorization, and project identity.',
 		},
 	],
 	['horizon', 'Horizon & Deck'],
