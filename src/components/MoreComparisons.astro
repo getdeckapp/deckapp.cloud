@@ -1,0 +1,31 @@
+---
+import { comparisons } from '../data/comparisons';
+
+interface Props {
+	current: string;
+}
+
+const { current } = Astro.props;
+const others = comparisons.filter((c) => c.slug !== current);
+---
+
+<section class="mx-auto max-w-[1180px] px-5 pb-20">
+	<div class="flex flex-wrap items-end justify-between gap-4">
+		<div>
+			<span class="pill bg-teal-tint c-teal">More comparisons</span>
+			<h2 class="display mt-4 text-[32px] sm:text-[36px]">Weighing something else?</h2>
+		</div>
+		<a href="/#compare" class="lnk c-orange text-[15px]">Back to the overview →</a>
+	</div>
+	<div class="mt-8 grid gap-5 md:grid-cols-3">
+		{
+			others.map((c) => (
+				<a href={`/${c.slug}/`} class="card-b pop-sm block p-6 transition-transform hover:-translate-y-1">
+					<p class="display text-[20px]">{c.label}</p>
+					<p class="mt-2 text-[14px] leading-[1.5] c-soft">{c.blurb}</p>
+					<p class="mt-4 text-[14px] font-semibold c-orange">Read the comparison →</p>
+				</a>
+			))
+		}
+	</div>
+</section>

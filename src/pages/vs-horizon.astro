@@ -1,0 +1,177 @@
+---
+import MarketingLayout from '../layouts/MarketingLayout.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import ComparisonTable from '../components/ComparisonTable.astro';
+import MoreComparisons from '../components/MoreComparisons.astro';
+import TrialCta from '../components/TrialCta.astro';
+import type { Row } from '../data/comparisons';
+
+const title = 'Deck vs Laravel Horizon — Queue Supervision vs Durable Job History';
+const description =
+	'Deck vs Horizon for Laravel queues. Horizon supervises workers and keeps about an hour of recent jobs in Redis. Deck adds a durable per-job history in your database, cooperative cancel, class blocking and stale-job alerts. Most teams run both.';
+
+// Horizon defaults from config/horizon.php `trim`: recent/pending/completed 60 min,
+// failed/recent_failed/monitored 10080 min (7 days). Keep this factual.
+const rows: Row[] = [
+	['Workers & throughput', 'Worker supervision, auto-balancing & restarts', false, true],
+	['Workers & throughput', 'Throughput, runtime & wait-time metrics', 'Per-class avg, p50, p95, failure rate', true],
+	['Workers & throughput', 'Pause, continue & terminate supervisors', false, true],
+	['Workers & throughput', 'Queue drivers', 'Any Laravel driver', 'Redis only'],
+	['Job history', 'Recent jobs list', true, '60 minutes by default'],
+	['Job history', 'Completed job history', 'Months, in your database', '60 minutes, in Redis'],
+	['Job history', 'Failed job history', 'As long as you set retention', '7 days, in Redis'],
+	['Job history', 'Search every execution by class, queue, tag or UUID', true, 'Tag search over the recent window'],
+	['Job history', 'Per-class stats and last-run time', true, false],
+	['Job history', 'Live progress reported from inside a running job', true, false],
+	['Incident controls', 'Retry a failed job from the dashboard', true, true],
+	['Incident controls', 'Cooperative cancel of a job that is already running', 'Opt-in per class', false],
+	['Incident controls', 'Block a single job class for 1h / 24h / until you say so', true, 'Silencing only hides jobs from the UI'],
+	['Incident controls', 'Clear a pending queue backlog', 'From the dashboard', 'horizon:clear on the CLI'],
+	['Alerts', '“Class X hasn’t run in 24h” alerts per job class', true, false],
+	['Alerts', 'Long wait-time notifications', 'Unprocessed-queue detection', 'Slack, SMS & mail'],
+	['Alerts', 'Long-running job flags', true, false],
+	['Team & deployment', 'Open source, MIT, self-hosted in your app', true, true],
+	['Team & deployment', 'Dashboard authorization', 'Reuses Horizon’s gate when present', 'viewHorizon gate'],
+	['Team & deployment', 'Hosted dashboard across many apps & environments', 'Deck Cloud', false],
+];
+
+const whyBoth = [
+	['Horizon flies the workers', 'Supervisors, balancing, restarts, real-time throughput. Nothing else does this for Redis queues, and Deck doesn’t try to.'],
+	['Deck remembers what they did', 'Horizon trims completed jobs after an hour and failed jobs after a week. Deck writes every execution to your database and keeps it as long as you say.'],
+	['Deck acts when Horizon can only watch', 'Cancel a running job cooperatively, block one noisy class for a day, and get an alert when a class goes silent. Horizon can retry and silence; that’s where it stops.'],
+	['Nothing changes for your workers', 'Deck listens to queue events and reuses Horizon’s authorization gate. Install it and open /deck next to /horizon.'],
+];
+
+const whenHorizonAlone = [
+	'Your queue volume is small enough that an hour of history is genuinely enough.',
+	'You never need to find a specific job after the fact, only watch the fleet in real time.',
+	'You are on Redis only and have no jobs worth cancelling or blocking mid-incident.',
+];
+---
+
+<MarketingLayout title={title} description={description}>
+	<SiteHeader />
+
+	<!-- ═══ hero ═════════════════════════════════════════════ -->
+	<section class="warm-top">
+		<div class="mx-auto max-w-[1180px] px-5 py-16 lg:py-24">
+			<div class="max-w-[760px]">
+				<span class="pill bg-teal-tint c-teal"><span class="size-2 rounded-full bg-teal"></span>Comparison</span>
+				<h1 class="display mt-6 text-[48px] sm:text-[64px] lg:text-[72px]">
+					Deck vs Horizon:<br />
+					<span class="c-orange">not</span> either/or.
+				</h1>
+				<p class="mt-7 max-w-[640px] text-[18px] leading-[1.6] c-soft">
+					<span class="font-bold c-ink">Horizon</span> is the best way to run Redis queues in
+					Laravel. It supervises workers, balances load and shows you the last hour in real time.
+					What it doesn’t do is remember. <span class="font-bold c-ink">Deck</span> is the
+					memory and the control panel Horizon leaves out: every execution kept in your database,
+					plus cancel, block and stale-job alerts. Keep Horizon. Add Deck.
+				</p>
+				<div class="mt-9 flex flex-wrap items-center gap-4">
+					<a href="https://app.deckapp.cloud/register" class="btn btn-primary">Start 7-day free trial →</a>
+					<a href="/package/horizon/" class="btn btn-paper">How Deck plugs into Horizon</a>
+				</div>
+			</div>
+
+			<div class="mt-12 grid gap-6 md:grid-cols-2">
+				<div class="card-b pop-orange p-7">
+					<span class="pill bg-orange-tint c-orange-ink">Deck</span>
+					<h2 class="display mt-4 text-[26px]">The record of what your queue did.</h2>
+					<p class="mt-3 text-[15px] leading-[1.6] c-soft">
+						Every dispatch lands in your database with status, attempts, duration and tags, on any
+						driver. Search a week-old failure by UUID, see when a class last ran, cancel a runaway
+						job, block a noisy class, and get paged when something goes quiet. With Horizon present,
+						Deck reuses its gate and pulls in worker snapshots and failed-job retry.
+					</p>
+				</div>
+				<div class="card-b p-7">
+					<span class="pill bg-teal-tint c-teal">Horizon</span>
+					<h2 class="display mt-4 text-[26px]">The supervisor for your workers.</h2>
+					<p class="mt-3 text-[15px] leading-[1.6] c-soft">
+						Horizon runs and balances worker processes for Redis queues and shows throughput, runtime
+						and wait time live. Recent and completed jobs are trimmed from Redis after an hour by
+						default and failed jobs after a week. Once they are gone, they are gone.
+					</p>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- ═══ compare ══════════════════════════════════════════ -->
+	<section id="compare" class="mx-auto max-w-[1180px] px-5 py-20">
+		<div class="max-w-[640px]">
+			<span class="pill bg-sun-tint c-ink">Side by side</span>
+			<h2 class="display mt-5 text-[40px] sm:text-[48px]">What each one does.</h2>
+			<p class="mt-4 text-[17px] leading-[1.6] c-soft">
+				A checkmark means the capability ships today. Where a plain yes or no would be misleading,
+				the cell says what actually happens. Horizon retention figures are its defaults.
+			</p>
+		</div>
+
+		<ComparisonTable competitor="Horizon" rows={rows} />
+
+		<div class="card-b bg-sun-tint mt-10 flex flex-col items-start gap-5 p-7 sm:flex-row sm:items-center sm:justify-between">
+			<div>
+				<p class="display text-[22px]">Add the memory to your Horizon setup.</p>
+				<p class="mt-1.5 text-[14.5px] c-soft">One composer require, one migrate. Horizon keeps running exactly as it does now.</p>
+			</div>
+			<div class="flex flex-wrap items-center gap-3">
+				<a href="https://app.deckapp.cloud/register" class="btn btn-primary">Start free trial →</a>
+				<a href="/package/getting-started/" class="btn btn-paper">Install the package</a>
+			</div>
+		</div>
+	</section>
+
+	<!-- ═══ which one ════════════════════════════════════════ -->
+	<section class="bg-paper2 border-y border-[color:var(--border)]">
+		<div class="mx-auto max-w-[1180px] px-5 py-20">
+			<div class="max-w-[640px]">
+				<span class="pill bg-orange-tint c-orange-ink">The honest answer</span>
+				<h2 class="display mt-5 text-[40px] sm:text-[48px]">Run both. Here’s why.</h2>
+				<p class="mt-4 text-[17px] leading-[1.6] c-soft">
+					Deck was built for teams running Horizon in production. It doesn’t replace a single thing
+					Horizon does; it fills in the parts that hurt at 2am.
+				</p>
+			</div>
+
+			<div class="mt-12 grid gap-6 lg:grid-cols-[1.15fr_0.85fr] lg:items-start">
+				<div class="card-b pop-orange p-7">
+					<h3 class="display text-[24px]">Why Horizon teams add Deck</h3>
+					<div class="mt-6 space-y-5">
+						{whyBoth.map(([heading, body]) => (
+							<div class="flex items-start gap-3">
+								<span class="c-orange mt-0.5 font-bold">✓</span>
+								<div>
+									<p class="font-bold text-[15.5px]">{heading}</p>
+									<p class="mt-1 text-[14.5px] leading-[1.55] c-soft">{body}</p>
+								</div>
+							</div>
+						))}
+					</div>
+				</div>
+				<div class="card-b p-7">
+					<h3 class="display text-[24px]">When Horizon alone is enough</h3>
+					<ul class="mt-6 space-y-3.5 text-[15px] leading-[1.55]">
+						{whenHorizonAlone.map((f) => (
+							<li class="flex items-start gap-2.5"><span class="c-teal font-bold">✓</span><span>{f}</span></li>
+						))}
+					</ul>
+					<p class="mt-6 text-[14px] leading-[1.6] c-soft">
+						If all three hold, you don’t need Deck yet. The package is MIT, so it costs nothing to
+						install the day one of them stops being true.
+					</p>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<div class="pt-20">
+		<MoreComparisons current="vs-horizon" />
+	</div>
+
+	<TrialCta />
+
+	<SiteFooter />
+</MarketingLayout>

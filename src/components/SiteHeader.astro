@@ -1,5 +1,6 @@
 ---
 import Logo from './Logo.astro';
+import { comparisons } from '../data/comparisons';
 ---
 
 <header class="sticky top-0 z-40 bg-paper/90 backdrop-blur-sm">
@@ -8,7 +9,29 @@ import Logo from './Logo.astro';
 		<nav class="hidden items-center gap-7 text-[15px] lg:flex">
 			<a href="/#features" class="lnk">Features</a>
 			<a href="/#cloud" class="lnk c-orange">Deck Cloud</a>
-			<a href="/#compare" class="lnk">vs Horizon</a>
+
+			<!-- Compare dropdown: CSS-only, opens on hover and on keyboard focus -->
+			<div class="group relative">
+				<button type="button" class="lnk inline-flex items-center gap-1.5 bg-transparent" aria-haspopup="true">
+					Compare
+					<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="transition-transform group-hover:rotate-180 group-focus-within:rotate-180" aria-hidden="true">
+						<path d="m6 9 6 6 6-6" />
+					</svg>
+				</button>
+				<div class="invisible absolute left-1/2 top-full z-50 -translate-x-1/2 pt-3 opacity-0 transition-[opacity,visibility] duration-150 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
+					<div class="card-b pop w-[300px] p-2">
+						{
+							comparisons.map((c) => (
+								<a href={`/${c.slug}/`} class="block rounded-lg px-3.5 py-2.5 transition-colors hover:bg-paper2">
+									<span class="block text-[14.5px] font-bold">{c.label}</span>
+									<span class="mt-0.5 block text-[12.5px] leading-[1.4] c-soft">{c.blurb}</span>
+								</a>
+							))
+						}
+					</div>
+				</div>
+			</div>
+
 			<a href="/#pricing" class="lnk">Pricing</a>
 			<a href="/overview/" class="lnk">Docs</a>
 		</nav>

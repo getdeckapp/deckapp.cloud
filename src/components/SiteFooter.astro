@@ -1,5 +1,6 @@
 ---
 import Logo from './Logo.astro';
+import { comparisons } from '../data/comparisons';
 ---
 
 <footer class="mx-auto max-w-[1180px] px-5 py-14">
@@ -28,8 +29,12 @@ import Logo from './Logo.astro';
 		<div>
 			<p class="text-[13px] font-bold uppercase tracking-wide c-faint">Compare</p>
 			<ul class="mt-4 space-y-2.5 text-[15px]">
-				<li><a href="/#compare" class="lnk">Deck vs Horizon</a></li>
-				<li><a href="/vs-vigilance/" class="lnk">Deck vs Vigilance</a></li>
+				{comparisons.map((c) => (
+					<li><a href={`/${c.slug}/`} class="lnk">{c.label}</a></li>
+				))}
+			</ul>
+			<p class="mt-6 text-[13px] font-bold uppercase tracking-wide c-faint">Resources</p>
+			<ul class="mt-4 space-y-2.5 text-[15px]">
 				<li><a href="https://github.com/getdeckapp/deck" class="lnk">GitHub</a></li>
 				<li><a href="https://packagist.org/packages/deck/deck" class="lnk">Packagist</a></li>
 			</ul>
