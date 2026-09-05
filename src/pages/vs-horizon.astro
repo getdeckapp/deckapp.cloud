@@ -9,7 +9,7 @@ import type { Row } from '../data/comparisons';
 
 const title = 'Deck vs Laravel Horizon — Queue Supervision vs Durable Job History';
 const description =
-	'Deck vs Horizon for Laravel queues. Horizon supervises workers and keeps about an hour of recent jobs in Redis. Deck adds a durable per-job history in your database, cooperative cancel, class blocking and stale-job alerts. Most teams run both.';
+	'Deck vs Horizon for Laravel queue monitoring. Horizon supervises workers and keeps an hour of history. Deck adds durable job history, cancel, block and alerts.';
 
 // Horizon defaults from config/horizon.php `trim`: recent/pending/completed 60 min,
 // failed/recent_failed/monitored 10080 min (7 days). Keep this factual.
@@ -67,7 +67,8 @@ const whenHorizonAlone = [
 					Laravel. It supervises workers, balances load and shows you the last hour in real time.
 					What it doesn’t do is remember. <span class="font-bold c-ink">Deck</span> is the
 					memory and the control panel Horizon leaves out: every execution kept in your database,
-					plus cancel, block and stale-job alerts. Keep Horizon. Add Deck.
+					plus cancel, block and stale-job alerts. If you went looking for a Horizon alternative
+					because the history keeps disappearing, you don’t need one. Keep Horizon. Add Deck.
 				</p>
 				<div class="mt-9 flex flex-wrap items-center gap-4">
 					<a href="https://app.deckapp.cloud/register" class="btn btn-primary">Start 7-day free trial →</a>
@@ -132,7 +133,8 @@ const whenHorizonAlone = [
 				<h2 class="display mt-5 text-[40px] sm:text-[48px]">Run both. Here’s why.</h2>
 				<p class="mt-4 text-[17px] leading-[1.6] c-soft">
 					Deck was built for teams running Horizon in production. It doesn’t replace a single thing
-					Horizon does; it fills in the parts that hurt at 2am.
+					Horizon does; it fills in the parts that hurt at 2am. For Laravel queue monitoring that has
+					to survive past Redis, the two belong together.
 				</p>
 			</div>
 

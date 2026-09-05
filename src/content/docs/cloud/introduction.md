@@ -1,6 +1,6 @@
 ---
 title: Introduction
-description: Deck Cloud is hosted Laravel queue observability across multiple apps and environments — one dashboard for job history, worker snapshots, and remote cancel/block, without replacing Horizon.
+description: Deck Cloud is hosted Laravel queue observability across many apps — job history, worker snapshots and remote cancel/block, without replacing Horizon.
 head:
   - tag: title
     content: Deck Cloud — Hosted Laravel Queue Observability Across Multiple Apps
