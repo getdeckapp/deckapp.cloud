@@ -1,0 +1,41 @@
+---
+import Logo from './Logo.astro';
+---
+
+<footer class="mx-auto max-w-[1180px] px-5 py-14">
+	<div class="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+		<div>
+			<a href="/" class="flex items-center gap-2.5"><Logo /></a>
+			<p class="mt-4 max-w-[280px] text-[14px] leading-[1.6] c-soft">
+				Job-class observability and cooperative cancellation for Laravel apps running Horizon.
+			</p>
+		</div>
+		<div>
+			<p class="text-[13px] font-bold uppercase tracking-wide c-faint">Product</p>
+			<ul class="mt-4 space-y-2.5 text-[15px]">
+				<li><a href="/#features" class="lnk">Features</a></li>
+				<li><a href="/#cloud" class="lnk">Deck Cloud</a></li>
+				<li><a href="/overview/" class="lnk">Documentation</a></li>
+			</ul>
+		</div>
+		<div>
+			<p class="text-[13px] font-bold uppercase tracking-wide c-faint">Package</p>
+			<ul class="mt-4 space-y-2.5 text-[15px]">
+				<li><a href="/package/getting-started/" class="lnk">Getting Started</a></li>
+				<li><a href="/package/usage/" class="lnk">Usage</a></li>
+			</ul>
+		</div>
+		<div>
+			<p class="text-[13px] font-bold uppercase tracking-wide c-faint">Compare</p>
+			<ul class="mt-4 space-y-2.5 text-[15px]">
+				<li><a href="/#compare" class="lnk">Deck vs Horizon</a></li>
+				<li><a href="/vs-vigilance/" class="lnk">Deck vs Vigilance</a></li>
+				<li><a href="https://github.com/getdeckapp/deck" class="lnk">GitHub</a></li>
+				<li><a href="https://packagist.org/packages/deck/deck" class="lnk">Packagist</a></li>
+			</ul>
+		</div>
+	</div>
+	<div class="mt-12 border-t border-[color:var(--border-strong)] pt-6 text-[13px] c-soft">
+		© 2026 Deck · MIT licensed · built by <a href="https://github.com/tormjens" class="lnk">@tormjens</a>
+	</div>
+</footer>
