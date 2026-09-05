@@ -3,12 +3,12 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: ['main']
-  # Fired by the upstream docs repo (getdeckapp/deck) whenever its docs
-  # change — see .github/workflows/notify-docs-site.yml over there. The
-  # build re-runs `npm run sync:package-docs`, so package docs stay current
-  # without waiting for a commit to this repo.
-  repository_dispatch:
-    types: [docs-updated]
+  # Rebuild on a schedule so package docs stay current. The build re-runs
+  # `npm run sync:package-docs`, pulling the latest docs from
+  # getdeckapp/deck without waiting for a commit to this repo. Cron is UTC;
+  # GitHub may delay scheduled runs under load.
+  schedule:
+    - cron: '0 */6 * * *' # every 6 hours
   workflow_dispatch:
 
 permissions:
