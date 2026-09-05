@@ -1,9 +1,17 @@
 ---
 import '../styles/marketing.css';
 
-const title = 'Deck — Job-class observability for Laravel';
-const description =
-	'Horizon flies the workers. Deck runs the operation — durable per-job history, cooperative cancellation, and stale-job alerts that survive past Redis retention.';
+interface Props {
+	title?: string;
+	description?: string;
+}
+
+const {
+	title = 'Deck — Laravel Queue Observability & Job History Dashboard (Horizon Add-on)',
+	description = 'Laravel queue observability and job execution history for Horizon. Durable per-job logs, cooperative cancellation, and stale-job alerts that survive Redis retention.',
+} = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site);
 ---
 
 <!doctype html>
@@ -13,9 +21,15 @@ const description =
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<title>{title}</title>
 		<meta name="description" content={description} />
+		<link rel="canonical" href={canonical} />
 		<meta property="og:title" content={title} />
 		<meta property="og:description" content={description} />
 		<meta property="og:type" content="website" />
+		<meta property="og:url" content={canonical} />
+		<meta property="og:site_name" content="Deck" />
+		<meta name="twitter:card" content="summary" />
+		<meta name="twitter:title" content={title} />
+		<meta name="twitter:description" content={description} />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="theme-color" content="#fcf5ea" />
 		<link rel="preconnect" href="https://fonts.googleapis.com" />

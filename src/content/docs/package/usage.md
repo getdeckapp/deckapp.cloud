@@ -1,6 +1,13 @@
 ---
 title: Usage
-description: Deck package documentation — usage.
+description: "How to use the Deck Laravel queue dashboard: search job execution history, cancel running jobs cooperatively, block job classes, retry failures, and set up stale-job alerts."
+head:
+  - tag: title
+    content: "Laravel Queue Dashboard Usage — Search, Cancel, Block Jobs"
+  - tag: meta
+    attrs:
+      property: og:title
+      content: "Laravel Queue Dashboard Usage — Search, Cancel, Block Jobs"
 ---
 
 ## Automatic recording

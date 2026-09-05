@@ -1,10 +1,31 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
+// [slug, sidebar/H1 title, SEO overrides]
+//
+// `title` drives the H1 and sidebar label and must stay short. When `seo` is
+// set, its `title` replaces the `<title>` tag (and og:title) only, and its
+// `description` becomes the meta description — page content is untouched.
 const PACKAGE_DOCS = [
-	['getting-started', 'Getting Started'],
+	[
+		'getting-started',
+		'Getting Started',
+		{
+			title: 'Install Deck — Laravel Queue Monitoring Setup Guide',
+			description:
+				'Install the Deck package to add Laravel queue monitoring on top of Horizon: requirements, composer install, migrations, authorization, and project identity.',
+		},
+	],
 	['horizon', 'Horizon & Deck'],
-	['usage', 'Usage'],
+	[
+		'usage',
+		'Usage',
+		{
+			title: 'Laravel Queue Dashboard Usage — Search, Cancel, Block Jobs',
+			description:
+				'How to use the Deck Laravel queue dashboard: search job execution history, cancel running jobs cooperatively, block job classes, retry failures, and set up stale-job alerts.',
+		},
+	],
 	['production', 'Production'],
 	['configuration', 'Configuration'],
 ];
@@ -13,7 +34,33 @@ const BASE_URL =
 	'https://raw.githubusercontent.com/getdeckapp/deck/master/docs';
 const OUT_DIR = path.join(process.cwd(), 'src/content/docs/package');
 
-const titles = Object.fromEntries(PACKAGE_DOCS);
+// JSON strings are valid YAML scalars, so this safely quotes colons, dashes, etc.
+const yaml = (value) => JSON.stringify(value);
+
+function buildFrontmatter(title, seo) {
+	const lines = ['---', `title: ${title}`];
+
+	if (seo) {
+		lines.push(
+			`description: ${yaml(seo.description)}`,
+			'head:',
+			'  - tag: title',
+			`    content: ${yaml(seo.title)}`,
+			'  - tag: meta',
+			'    attrs:',
+			'      property: og:title',
+			`      content: ${yaml(seo.title)}`,
+		);
+	} else {
+		lines.push(
+			`description: Deck package documentation — ${title.toLowerCase()}.`,
+		);
+	}
+
+	lines.push('---', '', '');
+
+	return lines.join('\n');
+}
 
 function rewriteLinks(content) {
 	return content
@@ -45,7 +92,7 @@ Using Deck Cloud? See the [Cloud docs](/cloud/introduction/).
 async function sync() {
 	fs.mkdirSync(OUT_DIR, { recursive: true });
 
-	for (const [slug, title] of PACKAGE_DOCS) {
+	for (const [slug, title, seo] of PACKAGE_DOCS) {
 		const response = await fetch(`${BASE_URL}/${slug}.md`);
 
 		if (!response.ok) {
@@ -55,12 +102,7 @@ async function sync() {
 		let body = rewriteLinks(await response.text());
 		body = body.replace(/^# .+\n\n/, '');
 
-		const frontmatter = `---
-title: ${title}
-description: Deck package documentation — ${title.toLowerCase()}.
----
-
-`;
+		const frontmatter = buildFrontmatter(title, seo);
 
 		fs.writeFileSync(
 			path.join(OUT_DIR, `${slug}.md`),

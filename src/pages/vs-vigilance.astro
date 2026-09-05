@@ -1,0 +1,213 @@
+---
+import MarketingLayout from '../layouts/MarketingLayout.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import TrialCta from '../components/TrialCta.astro';
+
+const title = 'Deck vs Vigilance — Which Laravel Queue Monitoring Tool Fits Your Team?';
+const description =
+	'Deck vs Vigilance for Laravel queue monitoring: Horizon-native job history and incident controls, or an all-in-one APM with tracing, RUM and SLOs. Which one fits your situation.';
+
+// Each cell is `true` (✓), `false` (–) or a short note when neither is honest.
+// Vigilance details come from its public README (github.com/anousss007/laravel-vigilance)
+// as of September 2026 — keep this table factual when either project changes.
+type Cell = boolean | string;
+type Row = [group: string, label: string, deck: Cell, vigilance: Cell];
+
+const rows: Row[] = [
+	['Queue history', 'Per-execution job history in your own database', true, true],
+	['Queue history', 'Search & filter execution history', true, true],
+	['Queue history', 'Per-class runtime stats (avg, p50, p95, failure rate)', true, 'Pre-aggregated rolling buckets (1h–7d)'],
+	['Queue history', 'Queue drivers beyond Redis (database, SQS, Beanstalkd)', false, true],
+	['Queue history', 'Runs alongside Horizon — same auth, failed-job retry, worker snapshots', true, 'Own supervisor; Horizon not required'],
+	['Incident controls', 'Cooperative cancel of a job that is already running', 'Opt-in per class', 'Pending jobs only (database driver)'],
+	['Incident controls', 'Block a single job class for 1h / 24h / until you say so', true, 'Pause whole queues, not classes'],
+	['Incident controls', 'Pause / resume entire queues', false, true],
+	['Incident controls', 'Clear a pending queue backlog', true, true],
+	['Alerts', '“Class X hasn’t run in 24h” alerts per job class', true, 'Overdue scheduled tasks; backlog & failure-rate rules'],
+	['Alerts', 'Alert channels', 'Any Laravel notification channel', 'Email, Slack, Discord, Teams, webhooks'],
+	['Alerts', 'Shared incident history for the whole team', 'Deck Cloud', true],
+	['Beyond queues', 'Artisan commands & scheduler monitoring', false, true],
+	['Beyond queues', 'Whole-app APM: routes, queries, outgoing HTTP, cache, servers', false, true],
+	['Beyond queues', 'Per-request / per-job trace waterfalls', false, true],
+	['Beyond queues', 'Real User Monitoring (Core Web Vitals, JS errors)', false, true],
+	['Beyond queues', 'SLOs, error budgets & burn-rate alerts', false, true],
+	['Beyond queues', 'Uptime checks, logs explorer, release health', false, true],
+	['Deployment', 'Open source, MIT, self-hosted in your app', true, true],
+	['Deployment', 'Hosted dashboard across many apps & environments', 'Deck Cloud', false],
+	['Deployment', 'Requirements', 'PHP 8.3+, Laravel 11–13', 'PHP 8.2+, Laravel 12–13, Livewire'],
+];
+
+const groups = [...new Set(rows.map(([g]) => g))];
+
+const pickDeck = [
+	'You already run Horizon and want to keep it exactly as it is.',
+	'The thing that keeps biting you is a job that silently stopped running, or a failure nobody can find a week later.',
+	'You need to stop a job mid-flight without SIGTERM, or quiet one noisy class without a redeploy.',
+	'You want one hosted view across many apps and environments without hosting another dashboard.',
+];
+
+const pickVigilance = [
+	'You run queues on the database, SQS or Beanstalkd drivers and Horizon isn’t an option.',
+	'You want commands, the scheduler, HTTP requests, queries and servers in one self-hosted place.',
+	'Tracing, Core Web Vitals and SLO error budgets matter to you as much as queue history.',
+	'You’d rather run one broad tool than pick a specialist for each concern.',
+];
+---
+
+<MarketingLayout title={title} description={description}>
+	<SiteHeader />
+
+	<!-- ═══ hero ═════════════════════════════════════════════ -->
+	<section class="warm-top">
+		<div class="mx-auto max-w-[1180px] px-5 py-16 lg:py-24">
+			<div class="max-w-[760px]">
+				<span class="pill bg-teal-tint c-teal"><span class="size-2 rounded-full bg-teal"></span>Comparison</span>
+				<h1 class="display mt-6 text-[48px] sm:text-[64px] lg:text-[72px]">
+					Deck vs Vigilance:<br />
+					<span class="c-orange">which one</span> fits<br />
+					your situation?
+				</h1>
+				<p class="mt-7 max-w-[620px] text-[18px] leading-[1.6] c-soft">
+					Both are MIT-licensed Laravel packages. Both record your queue jobs. They solve different
+					problems: <span class="font-bold c-ink">Deck</span> is a narrow add-on for Horizon
+					teams that need durable history and incident controls.
+					<span class="font-bold c-ink">Vigilance</span> is a broad, self-hosted control center
+					and APM for the whole application.
+				</p>
+			</div>
+
+			<div class="mt-12 grid gap-6 md:grid-cols-2">
+				<div class="card-b pop p-7">
+					<span class="pill bg-orange-tint c-orange-ink">Deck</span>
+					<h2 class="display mt-4 text-[26px]">A memory for Horizon queues.</h2>
+					<p class="mt-3 text-[15px] leading-[1.6] c-soft">
+						Horizon keeps the workers running. Deck keeps a durable, searchable record of every
+						dispatch in your database, adds cooperative cancel, per-class blocking and stale-job
+						alerts, and stops there. Deck Cloud puts many apps on one hosted dashboard.
+					</p>
+				</div>
+				<div class="card-b pop p-7">
+					<span class="pill bg-teal-tint c-teal">Vigilance</span>
+					<h2 class="display mt-4 text-[26px]">An all-in-one control center & APM.</h2>
+					<p class="mt-3 text-[15px] leading-[1.6] c-soft">
+						Vigilance is driver-agnostic and ships its own supervisor, so it covers queues,
+						commands and the scheduler on any driver. On top of that it adds whole-app APM,
+						tracing, Real User Monitoring, SLOs, uptime and server metrics, all self-hosted.
+					</p>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- ═══ compare ══════════════════════════════════════════ -->
+	<section id="compare" class="mx-auto max-w-[1180px] px-5 py-20">
+		<div class="max-w-[640px]">
+			<span class="pill bg-sun-tint c-ink">Side by side</span>
+			<h2 class="display mt-5 text-[40px] sm:text-[48px]">What each one does.</h2>
+			<p class="mt-4 text-[17px] leading-[1.6] c-soft">
+				A checkmark means the capability ships in the package today. Where a plain yes or no would
+				be misleading, the cell says what actually happens.
+			</p>
+		</div>
+
+		<div class="card-b pop mt-10 overflow-hidden">
+			<div class="overflow-x-auto">
+				<div class="min-w-[720px]">
+					<div class="grid grid-cols-[1fr_200px_200px] border-b border-[color:var(--border)] bg-paper2 px-5 py-3.5 text-[13px] font-bold uppercase tracking-wide">
+						<span>Capability</span>
+						<span class="text-center c-orange">Deck</span>
+						<span class="text-center c-teal">Vigilance</span>
+					</div>
+					{
+						groups.map((group) => (
+							<>
+								<div class="border-b border-[color:var(--border)] bg-paper2/60 px-5 py-2 text-[12px] font-bold uppercase tracking-wide c-faint">{group}</div>
+								{rows
+									.filter(([g]) => g === group)
+									.map(([, label, deck, vigilance], i) => (
+										<div class={`grid grid-cols-[1fr_200px_200px] items-center px-5 py-3.5 text-[14.5px] ${i % 2 ? 'bg-paper2/50' : ''}`}>
+											<span class="font-medium">{label}</span>
+											<span class="px-3 text-center">
+												{deck === true ? (
+													<span class="text-[18px] font-bold c-orange">✓</span>
+												) : deck === false ? (
+													<span class="text-[18px] c-faint">–</span>
+												) : (
+													<span class="text-[12.5px] leading-[1.4] c-soft">{deck}</span>
+												)}
+											</span>
+											<span class="px-3 text-center">
+												{vigilance === true ? (
+													<span class="text-[18px] font-bold c-teal">✓</span>
+												) : vigilance === false ? (
+													<span class="text-[18px] c-faint">–</span>
+												) : (
+													<span class="text-[12.5px] leading-[1.4] c-soft">{vigilance}</span>
+												)}
+											</span>
+										</div>
+									))}
+							</>
+						))
+					}
+				</div>
+			</div>
+		</div>
+		<p class="mt-5 text-[13px] leading-[1.6] c-faint">
+			Vigilance capabilities are taken from its
+			<a href="https://github.com/anousss007/laravel-vigilance" target="_blank" rel="noopener" class="lnk c-soft">public README</a>
+			as of September 2026. Both projects move quickly. If something here is out of date,
+			<a href="https://github.com/getdeckapp/deckapp.cloud/issues" target="_blank" rel="noopener" class="lnk c-soft">open an issue</a>
+			and we’ll fix it.
+		</p>
+	</section>
+
+	<!-- ═══ which one ════════════════════════════════════════ -->
+	<section class="bg-paper2 border-y border-[color:var(--border)]">
+		<div class="mx-auto max-w-[1180px] px-5 py-20">
+			<div class="max-w-[640px]">
+				<span class="pill bg-orange-tint c-orange-ink">The honest answer</span>
+				<h2 class="display mt-5 text-[40px] sm:text-[48px]">It depends on what’s on fire.</h2>
+				<p class="mt-4 text-[17px] leading-[1.6] c-soft">
+					Neither tool is a strict superset of the other. Deck goes deeper on one thing; Vigilance
+					goes wider across many. Start from the problem that paged you last.
+				</p>
+			</div>
+
+			<div class="mt-12 grid gap-6 lg:grid-cols-2">
+				<div class="card-b p-7">
+					<h3 class="display text-[24px]">Pick Deck if…</h3>
+					<ul class="mt-6 space-y-3.5 text-[15px] leading-[1.55]">
+						{pickDeck.map((f) => (
+							<li class="flex items-start gap-2.5"><span class="c-orange font-bold">✓</span><span>{f}</span></li>
+						))}
+					</ul>
+				</div>
+				<div class="card-b p-7">
+					<h3 class="display text-[24px]">Pick Vigilance if…</h3>
+					<ul class="mt-6 space-y-3.5 text-[15px] leading-[1.55]">
+						{pickVigilance.map((f) => (
+							<li class="flex items-start gap-2.5"><span class="c-teal font-bold">✓</span><span>{f}</span></li>
+						))}
+					</ul>
+				</div>
+			</div>
+
+			<div class="card-b mt-6 p-7">
+				<h3 class="display text-[24px]">Can you run both?</h3>
+				<p class="mt-3 max-w-[760px] text-[15px] leading-[1.6] c-soft">
+					Technically yes. Both listen to Laravel’s queue events, so each would keep its own
+					execution rows and you’d pay the storage twice. In practice, teams on Horizon who want
+					APM usually pair Deck with a dedicated APM or error tracker, and teams who want a single
+					self-hosted tool for everything reach for Vigilance. Pick one for queue history and be
+					deliberate about it.
+				</p>
+			</div>
+		</div>
+	</section>
+
+	<TrialCta />
+
+	<SiteFooter />
+</MarketingLayout>

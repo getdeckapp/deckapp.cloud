@@ -1,6 +1,13 @@
 ---
 title: Getting Started
-description: Deck package documentation — getting started.
+description: "Install the Deck package to add Laravel queue monitoring on top of Horizon: requirements, composer install, migrations, authorization, and project identity."
+head:
+  - tag: title
+    content: "Install Deck — Laravel Queue Monitoring Setup Guide"
+  - tag: meta
+    attrs:
+      property: og:title
+      content: "Install Deck — Laravel Queue Monitoring Setup Guide"
 ---
 
 ## Requirements

@@ -1,6 +1,7 @@
 ---
 import MarketingLayout from '../layouts/MarketingLayout.astro';
-import Logo from '../components/Logo.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
 import Features from '../components/Features.astro';
 import CloudSpotlight from '../components/CloudSpotlight.astro';
 import TrialCta from '../components/TrialCta.astro';
@@ -18,23 +19,7 @@ const compareRows = [
 ---
 
 <MarketingLayout>
-	<!-- ═══ header ═══════════════════════════════════════════ -->
-	<header class="sticky top-0 z-40 bg-paper/90 backdrop-blur-sm">
-		<div class="mx-auto flex max-w-[1180px] items-center justify-between gap-4 px-5 py-4">
-			<a href="/" class="flex shrink-0 items-center gap-2.5"><Logo /></a>
-			<nav class="hidden items-center gap-7 text-[15px] lg:flex">
-				<a href="#features" class="lnk">Features</a>
-				<a href="#cloud" class="lnk c-orange">Deck Cloud</a>
-				<a href="#compare" class="lnk">vs Horizon</a>
-				<a href="#pricing" class="lnk">Pricing</a>
-				<a href="/overview/" class="lnk">Docs</a>
-			</nav>
-			<div class="flex items-center gap-3">
-				<a href="https://github.com/getdeckapp/deck" target="_blank" rel="noopener" class="hidden text-[15px] lnk sm:inline">GitHub</a>
-				<a href="https://app.deckapp.cloud/register" class="btn btn-primary py-2.5 text-[14px]">Start free trial</a>
-			</div>
-		</div>
-	</header>
+	<SiteHeader />
 
 	<!-- ═══ hero ═════════════════════════════════════════════ -->
 	<section class="warm-top">
@@ -106,6 +91,28 @@ const compareRows = [
 
 	<Features />
 
+	<!-- ═══ monitoring / history ═════════════════════════════ -->
+	<section id="monitoring" class="bg-paper2 border-y border-[color:var(--border)]">
+		<div class="mx-auto grid max-w-[1180px] gap-10 px-5 py-20 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+			<div>
+				<span class="pill bg-orange-tint c-orange-ink">Queues need a memory</span>
+				<h2 class="display mt-5 text-[40px] sm:text-[48px]">Laravel queue monitoring, without losing history</h2>
+			</div>
+			<div class="max-w-[600px] text-[17px] leading-[1.6] c-soft">
+				<p>
+					Deck is for monitoring Laravel queues and jobs after the fact, not just while they run.
+					Every dispatch is written to your own database, so you can track job execution history
+					beyond Redis retention: what ran, what failed, how long it took, and how often.
+				</p>
+				<p class="mt-4">
+					It ships as a Horizon-compatible dashboard that lives alongside Horizon, with the same
+					authorization and no changes to your workers. Search a week-old failure by class, queue or
+					UUID, cancel a runaway job, or quiet a noisy class, all from the same screen.
+				</p>
+			</div>
+		</div>
+	</section>
+
 	<!-- ═══ compare ══════════════════════════════════════════ -->
 	<section id="compare" class="mx-auto max-w-[1180px] px-5 py-20">
 		<div class="max-w-[640px]">
@@ -133,6 +140,9 @@ const compareRows = [
 				))
 			}
 		</div>
+		<p class="mt-6 text-[14.5px] c-soft">
+			Weighing Deck against an all-in-one APM instead? See <a href="/vs-vigilance/" class="lnk c-orange">Deck vs Vigilance →</a>
+		</p>
 	</section>
 
 	<!-- ═══ pricing ══════════════════════════════════════════ -->
@@ -209,40 +219,5 @@ const compareRows = [
 
 	<TrialCta />
 
-	<!-- ═══ footer ═══════════════════════════════════════════ -->
-	<footer class="mx-auto max-w-[1180px] px-5 py-14">
-		<div class="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
-			<div>
-				<a href="/" class="flex items-center gap-2.5"><Logo /></a>
-				<p class="mt-4 max-w-[280px] text-[14px] leading-[1.6] c-soft">
-					Job-class observability and cooperative cancellation for Laravel apps running Horizon.
-				</p>
-			</div>
-			<div>
-				<p class="text-[13px] font-bold uppercase tracking-wide c-faint">Product</p>
-				<ul class="mt-4 space-y-2.5 text-[15px]">
-					<li><a href="#features" class="lnk">Features</a></li>
-					<li><a href="#cloud" class="lnk">Deck Cloud</a></li>
-					<li><a href="/overview/" class="lnk">Documentation</a></li>
-				</ul>
-			</div>
-			<div>
-				<p class="text-[13px] font-bold uppercase tracking-wide c-faint">Package</p>
-				<ul class="mt-4 space-y-2.5 text-[15px]">
-					<li><a href="/package/getting-started/" class="lnk">Getting Started</a></li>
-					<li><a href="/package/usage/" class="lnk">Usage</a></li>
-				</ul>
-			</div>
-			<div>
-				<p class="text-[13px] font-bold uppercase tracking-wide c-faint">Resources</p>
-				<ul class="mt-4 space-y-2.5 text-[15px]">
-					<li><a href="https://github.com/getdeckapp/deck" class="lnk">GitHub</a></li>
-					<li><a href="https://packagist.org/packages/deck/deck" class="lnk">Packagist</a></li>
-				</ul>
-			</div>
-		</div>
-		<div class="mt-12 border-t border-[color:var(--border-strong)] pt-6 text-[13px] c-soft">
-			© 2026 Deck · MIT licensed · built by <a href="https://github.com/tormjens" class="lnk">@tormjens</a>
-		</div>
-	</footer>
+	<SiteFooter />
 </MarketingLayout>
