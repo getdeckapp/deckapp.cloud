@@ -1,0 +1,195 @@
+---
+import MarketingLayout from '../layouts/MarketingLayout.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import ComparisonTable from '../components/ComparisonTable.astro';
+import MoreComparisons from '../components/MoreComparisons.astro';
+import TrialCta from '../components/TrialCta.astro';
+import type { Row } from '../data/comparisons';
+
+const title = 'Deck vs Skyline — A Record of Your Queue vs Live Queue Controls';
+const description =
+	'Deck vs Skyline for Laravel queues. Skyline replaces Horizon and adds live controls: pause, front-of-queue, weighted processing. Deck keeps a durable job history alongside Horizon. They run together with no conflict.';
+
+// Deck: installs alongside Horizon, durable execution log in your DB, per-class
+// stats, cooperative cancel, dispatch-time blocking. MIT + optional paid Cloud.
+// Skyline: commercial drop-in Horizon replacement, live queue controls
+// (pause/resume, front-of-queue, weighted, run-delayed-now). Paid, no migrations.
+const rows: Row[] = [
+	['The record — what happened', 'Durable job history beyond Redis retention', 'Kept in your database', false],
+	['The record — what happened', 'Per-class stats & SLOs', true, false],
+	['The record — what happened', 'Search a past execution by class, queue, tag or UUID', true, false],
+	['Acting on a live queue — what’s happening now', 'Stop a job that is already running', 'Cooperative cancel, prepared classes', 'Cannot touch reserved jobs'],
+	['Acting on a live queue — what’s happening now', 'Block a job class at dispatch', true, false],
+	['Acting on a live queue — what’s happening now', 'Pause & resume a queue', false, true],
+	['Acting on a live queue — what’s happening now', 'Run a delayed job immediately', false, true],
+	['Acting on a live queue — what’s happening now', 'Weighted / front-of-queue dispatch', false, true],
+	['Setup & licensing', 'Relationship to Horizon', 'Installs alongside Horizon', 'Replaces Horizon (drop-in)'],
+	['Setup & licensing', 'Database migrations required', true, 'None'],
+	['Setup & licensing', 'Price', 'Free / MIT (+ optional paid Cloud)', 'Paid'],
+];
+
+const chooseDeck = [
+	['Your history keeps disappearing', 'Redis trims completed and failed jobs, so the failure you need to explain is already gone. Deck writes every execution to your database and keeps it as long as you set.'],
+	['You’re flying blind on a class', 'Deck gives you per-class stats and SLOs, last-run times, and an alert when a class goes quiet. You find the one job that broke, weeks later, by UUID.'],
+	['You need to stop the bleeding on your terms', 'Cooperatively cancel a prepared job class mid-run, or block a noisy class the moment it’s dispatched, without pausing everything around it.'],
+	['You want it free and self-hosted', 'The package is MIT and lives in your app. Deck Cloud adds a hosted dashboard across every app when you want it, but nothing forces you off the free path.'],
+];
+
+const chooseSkyline = [
+	['You need to act on the queue right now', 'Pause and resume a queue during an incident, promote work to the front, or weight how queues are processed. These are live controls Deck doesn’t offer.'],
+	['A delayed job needs to run this second', 'Skyline can pull a delayed job forward and run it immediately, straight from the dashboard.'],
+	['You’d rather replace Horizon than add to it', 'Skyline is a drop-in Horizon replacement, so you get supervision plus its controls in one dashboard, with no migrations to run.'],
+	['You’re fine with a paid, closed tool', 'Skyline is commercial. If its live controls solve your pain, the licence is the cost of getting them.'],
+];
+---
+
+<MarketingLayout title={title} description={description}>
+	<SiteHeader />
+
+	<!-- ═══ hero ═════════════════════════════════════════════ -->
+	<section class="warm-top">
+		<div class="mx-auto max-w-[1180px] px-5 py-16 lg:py-24">
+			<div class="max-w-[760px]">
+				<span class="pill bg-teal-tint c-teal"><span class="size-2 rounded-full bg-teal"></span>Comparison</span>
+				<h1 class="display mt-6 text-[48px] sm:text-[64px] lg:text-[72px]">
+					Deck vs Skyline:<br />
+					the record, or<br />
+					<span class="c-orange">the controls</span>?
+				</h1>
+				<p class="mt-7 max-w-[640px] text-[18px] leading-[1.6] c-soft">
+					Both start where Horizon’s dashboard runs out. <span class="font-bold c-ink">Deck</span>
+					installs alongside Horizon and writes a durable execution log to your database — history that
+					outlives Redis retention, per-class stats and cooperative cancellation.
+					<span class="font-bold c-ink">Skyline</span> is a commercial fork that replaces Horizon and
+					adds live queue controls: pause and resume, front-of-queue dispatch, weighted processing.
+					They solve different problems, and they run together without conflict.
+				</p>
+				<div class="mt-9 flex flex-wrap items-center gap-4">
+					<a href="https://app.deckapp.cloud/register" class="btn btn-primary">Start 7-day free trial →</a>
+					<a href="#compare" class="btn btn-paper">See the comparison</a>
+				</div>
+			</div>
+
+			<div class="mt-12 grid gap-6 md:grid-cols-2">
+				<div class="card-b pop-orange p-7">
+					<span class="pill bg-orange-tint c-orange-ink">Deck</span>
+					<h2 class="display mt-4 text-[26px]">A record of what your queue did.</h2>
+					<p class="mt-3 text-[15px] leading-[1.6] c-soft">
+						Deck installs next to Horizon and records every dispatch in your database with status,
+						attempts, duration and tags. You get history that survives past Redis retention, per-class
+						stats and SLOs, cooperative cancellation of a running job, and the ability to block a job
+						class at dispatch during an incident. It’s a memory Horizon never kept.
+					</p>
+				</div>
+				<div class="card-b p-7">
+					<span class="pill bg-teal-tint c-teal">Skyline</span>
+					<h2 class="display mt-4 text-[26px]">Controls for what’s happening now.</h2>
+					<p class="mt-3 text-[15px] leading-[1.6] c-soft">
+						Skyline is a commercial, drop-in Horizon replacement. On top of the supervision Horizon
+						already does, it adds live controls for the queue in front of you: pause and resume a
+						queue, dispatch work to the front, weight how queues are processed, and run a delayed job
+						immediately. It’s a set of levers for the live queue, not a durable log of it.
+					</p>
+				</div>
+			</div>
+
+			<div class="card-b bg-sun-tint mt-6 flex items-start gap-3.5 p-6">
+				<span class="c-orange mt-0.5 text-[18px] font-bold">✓</span>
+				<p class="text-[15px] leading-[1.6] c-soft">
+					<span class="font-bold c-ink">You can run both.</span> Skyline is a drop-in Horizon
+					replacement serving the dashboard at <code class="c-ink">/horizon</code>; Deck listens to
+					queue events and serves its own dashboard at <code class="c-ink">/deck</code>. There’s no
+					conflict — keep Skyline’s live controls and add Deck’s durable record beside them.
+				</p>
+			</div>
+		</div>
+	</section>
+
+	<!-- ═══ compare ══════════════════════════════════════════ -->
+	<section id="compare" class="mx-auto max-w-[1180px] px-5 py-20">
+		<div class="max-w-[640px]">
+			<span class="pill bg-sun-tint c-ink">Side by side</span>
+			<h2 class="display mt-5 text-[40px] sm:text-[48px]">What each one does.</h2>
+			<p class="mt-4 text-[17px] leading-[1.6] c-soft">
+				A checkmark means the capability ships today. Where a plain yes or no would be misleading,
+				the cell says what actually happens. The split is deliberate: Deck records, Skyline acts.
+			</p>
+		</div>
+
+		<ComparisonTable competitor="Skyline" rows={rows} />
+
+		<div class="card-b bg-sun-tint mt-10 flex flex-col items-start gap-5 p-7 sm:flex-row sm:items-center sm:justify-between">
+			<div>
+				<p class="display text-[22px]">Different halves of the same problem.</p>
+				<p class="mt-1.5 text-[14.5px] c-soft">Deck is the record of what happened. Skyline is the controls for what’s happening now.</p>
+			</div>
+			<div class="flex flex-wrap items-center gap-3">
+				<a href="https://app.deckapp.cloud/register" class="btn btn-primary">Start free trial →</a>
+				<a href="/package/getting-started/" class="btn btn-paper">Install the package</a>
+			</div>
+		</div>
+	</section>
+
+	<!-- ═══ which one ════════════════════════════════════════ -->
+	<section class="bg-paper2 border-y border-[color:var(--border)]">
+		<div class="mx-auto max-w-[1180px] px-5 py-20">
+			<div class="max-w-[680px]">
+				<span class="pill bg-orange-tint c-orange-ink">The honest answer</span>
+				<h2 class="display mt-5 text-[40px] sm:text-[48px]">Which pain is yours?</h2>
+				<p class="mt-4 text-[17px] leading-[1.6] c-soft">
+					These aren’t really substitutes, so the choice comes down to one question: is your pain lost
+					history and no visibility into what your queue has been doing, or the inability to act on a
+					live queue the moment something goes wrong? The first is Deck. The second is Skyline. If it’s
+					both, run both.
+				</p>
+			</div>
+
+			<div class="mt-12 grid gap-6 lg:grid-cols-2 lg:items-start">
+				<div class="card-b pop-orange p-7">
+					<span class="pill bg-orange-tint c-orange-ink">Choose Deck if</span>
+					<div class="mt-6 space-y-5">
+						{chooseDeck.map(([heading, body]) => (
+							<div class="flex items-start gap-3">
+								<span class="c-orange mt-0.5 font-bold">✓</span>
+								<div>
+									<p class="font-bold text-[15.5px]">{heading}</p>
+									<p class="mt-1 text-[14.5px] leading-[1.55] c-soft">{body}</p>
+								</div>
+							</div>
+						))}
+					</div>
+				</div>
+				<div class="card-b p-7">
+					<span class="pill bg-teal-tint c-teal">Choose Skyline if</span>
+					<div class="mt-6 space-y-5">
+						{chooseSkyline.map(([heading, body]) => (
+							<div class="flex items-start gap-3">
+								<span class="c-teal mt-0.5 font-bold">✓</span>
+								<div>
+									<p class="font-bold text-[15.5px]">{heading}</p>
+									<p class="mt-1 text-[14.5px] leading-[1.55] c-soft">{body}</p>
+								</div>
+							</div>
+						))}
+					</div>
+				</div>
+			</div>
+
+			<p class="mt-8 max-w-[720px] text-[15px] leading-[1.6] c-soft">
+				<span class="font-bold c-ink">And if the answer is “both” — that’s fine.</span> Skyline replaces
+				Horizon and keeps the live controls at <code class="c-ink">/horizon</code>; Deck sits alongside
+				it and keeps the durable record at <code class="c-ink">/deck</code>. Running them together is
+				supported and expected, with no conflict between the two.
+			</p>
+		</div>
+	</section>
+
+	<div class="pt-20">
+		<MoreComparisons current="vs-skyline" />
+	</div>
+
+	<TrialCta />
+
+	<SiteFooter />
+</MarketingLayout>
