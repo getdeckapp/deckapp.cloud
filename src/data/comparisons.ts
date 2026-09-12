@@ -32,6 +32,12 @@ export const comparisons: Comparison[] = [
 		label: 'Deck vs Vigilance',
 		blurb: 'Self-hosted all-in-one APM, or deep on queues.',
 	},
+	{
+		slug: 'vs-skyline',
+		name: 'Skyline',
+		label: 'Deck vs Skyline',
+		blurb: 'A record of what happened, or controls for right now.',
+	},
 ];
 
 // Each table cell is `true` (✓), `false` (–) or a short note when neither is honest.
