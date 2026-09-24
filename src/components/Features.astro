@@ -17,11 +17,11 @@ const tints = {
 };
 
 const features = [
-	{ icon: icons.history, tint: 'orange', title: 'Durable execution log', body: 'Every queue dispatch lands in your database with start, finish, status, attempt count, and tags. Outlasts Redis retention by months.' },
-	{ icon: icons.pause, tint: 'teal', title: 'Cooperative cancel', body: 'Mark a job class Cancellable, drop a checkpoint between steps, and stop runaway work from the dashboard. No SIGTERM, no orphaned writes.' },
+	{ icon: icons.history, tint: 'orange', title: 'Durable execution log', body: 'Every queue dispatch is recorded with start, finish, status, attempt count, and tags — across every app and environment. Outlasts Redis retention by months.' },
+	{ icon: icons.pause, tint: 'teal', title: 'Remote cancel & retry', body: 'Stop runaway work or retry a failed job straight from the dashboard. Cancellable jobs stop at their next checkpoint — no SIGTERM, no orphaned writes.' },
 	{ icon: icons.search, tint: 'sun', title: 'Searchable activity', body: 'Filter by class, queue, connection, tag, or paste a UUID. The whole window of history is one search bar away, not a Redis dump.' },
 	{ icon: icons.shield, tint: 'teal', title: 'Per-class blocking', body: 'Temporarily quiet a noisy job class for 1 hour, 24 hours, or until you say so. Workers pick the block up on the next attempt — no redeploy.' },
-	{ icon: icons.alert, tint: 'orange', title: 'Stale-job alerts', body: "Subscribe per class: alert me if SyncInventory hasn't run in 24 hours. Deck checks on schedule and notifies through your existing Laravel channels." },
+	{ icon: icons.alert, tint: 'orange', title: 'Stale-job alerts', body: "Subscribe per class: alert me if SyncInventory hasn't run in 24 hours. Deck Cloud checks on schedule and alerts your team in Slack or by email." },
 ];
 ---
 
@@ -31,7 +31,7 @@ const features = [
 		<h2 class="display mt-5 text-[40px] sm:text-[48px]">Built for the people on call.</h2>
 		<p class="mt-4 text-[17px] leading-[1.6] c-soft">
 			Deck is opinionated about one thing: <span class="font-bold c-ink">queues need a memory</span>.
-			Every feature follows from that — and ships in the free package.
+			Every feature follows from that — and in Deck Cloud, it works across every app your team runs.
 		</p>
 	</div>
 
@@ -47,12 +47,12 @@ const features = [
 				</div>
 			))
 		}
-		<!-- CTA tile pointing at Cloud -->
-		<a href="#cloud" class="card-b pop-sm bg-ink c-paper on-ink flex flex-col justify-between p-6 transition-transform hover:-translate-y-1">
+		<!-- CTA tile: start the Cloud trial -->
+		<a href="https://app.deckapp.cloud/register" class="card-b pop-sm bg-ink c-paper on-ink flex flex-col justify-between p-6 transition-transform hover:-translate-y-1">
 			<span class="c-sun inline-flex size-12 items-center justify-center rounded-xl text-[22px] font-bold" style="background:rgba(245,158,11,0.14)">◆</span>
 			<div class="mt-8">
-				<h3 class="display text-[21px] c-paper">Run more than one app?</h3>
-				<p class="mt-2 text-[14.5px] leading-[1.5] text-[color:var(--paper)]/80">Deck Cloud puts every project and environment on one dashboard <span class="c-sun">→</span></p>
+				<h3 class="display text-[21px] c-paper">See it on your own queues</h3>
+				<p class="mt-2 text-[14.5px] leading-[1.5] text-[color:var(--paper)]/80">Start a 7-day free trial of Deck Cloud and connect your first app in minutes <span class="c-sun">→</span></p>
 			</div>
 		</a>
 	</div>
