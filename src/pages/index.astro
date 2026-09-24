@@ -182,11 +182,16 @@ const compareRows = [
 				<div class="card-b pop-orange bg-ink c-paper relative -mt-2 p-7 lg:-mt-4 lg:mb-2">
 					<span class="pill bg-orange c-paper absolute -top-3 right-6 border-paper text-[11px]" style="border-color:var(--paper)">★ Most popular</span>
 					<h3 class="display text-[24px] c-paper">Cloud Team</h3>
-					<span class="pill bg-orange c-paper mt-2 text-[11px]">7-day free trial</span>
-					<div class="mt-5 flex items-baseline gap-2">
-						<span class="display text-[46px] c-sun">$29</span>
-						<span class="text-[color:var(--paper)]/70">/ team / mo</span>
+					<div class="mt-2 flex flex-wrap gap-2">
+						<span class="pill bg-orange c-paper text-[11px]">7-day free trial</span>
+						<span class="pill bg-sun c-ink text-[11px]">Founding customer pricing</span>
 					</div>
+					<div class="mt-5 flex items-baseline gap-2">
+						<span class="display text-[46px] c-sun">$15</span>
+						<span class="text-[color:var(--paper)]/70">/ team / mo</span>
+						<s class="ml-1 text-[15px] text-[color:var(--paper)]/50"><span class="sr-only">Regular price </span>$29</s>
+					</div>
+					<p class="mt-1 text-[12.5px] text-[color:var(--paper)]/60">Regular price $29 / team / mo. Subscribe during early access and $15 is locked in for as long as you stay subscribed.</p>
 					<p class="mt-3 text-[14px] leading-[1.5] text-[color:var(--paper)]/80">One hosted dashboard for your whole team — unlimited projects and environments.</p>
 					<a href="https://app.deckapp.cloud/register" class="btn btn-primary mt-6 w-full justify-center">Start free trial →</a>
 					<ul class="mt-7 space-y-2.5 text-[14px]">
@@ -214,7 +219,15 @@ const compareRows = [
 					</ul>
 				</div>
 			</div>
-			<p class="mt-10 text-center text-[14px] c-soft">
+			<div class="card-b mx-auto mt-10 max-w-[760px] p-6 text-[14.5px] leading-[1.6]">
+				<span class="pill bg-sun-tint c-ink text-[11px]">Founding customer pricing</span>
+				<p class="mt-3 c-soft">
+					Cloud Team is <span class="font-bold c-ink">$15 / team / mo</span> for teams that subscribe now, during early
+					access. That rate is locked in permanently for as long as your subscription stays active — it won't go up
+					later, even once the regular <s>$29</s> price applies to new customers.
+				</p>
+			</div>
+			<p class="mt-6 text-center text-[14px] c-soft">
 				Every Cloud Team plan starts with a <span class="font-bold c-orange">7-day free trial</span> — no credit card, no charge until it ends.
 			</p>
 		</div>
