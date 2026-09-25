@@ -7,31 +7,33 @@ import MoreComparisons from '../components/MoreComparisons.astro';
 import TrialCta from '../components/TrialCta.astro';
 import type { Row } from '../data/comparisons';
 
-const title = 'Deck vs Vigilance — Which Laravel Queue Monitoring Tool Fits Your Team?';
+const title = 'Deck vs Vigilance — Hosted Deck Cloud vs Self-Hosted Laravel APM';
 const description =
-	'Deck vs Vigilance for Laravel queue monitoring. Deck goes deep on job history, cancel, block and alerts on any driver. Vigilance goes wide with all-in-one APM.';
+	'Deck vs Vigilance for Laravel queue monitoring. Deck Cloud is a hosted queue dashboard for every app, with cancel, block, retry and alerts. Vigilance is a self-hosted all-in-one APM.';
 
 // Vigilance details come from its public README (github.com/anousss007/laravel-vigilance)
 // as of September 2026 — keep this table factual when either project changes.
 const rows: Row[] = [
-	['Queue history', 'Per-execution job history in your own database', true, true],
+	['Queue history', 'Per-execution job history', true, true],
+	['Queue history', 'Where the data lives', 'Deck Cloud, or your own database self-hosted', 'Your own database'],
 	['Queue history', 'Works on any Laravel queue driver (database, Redis, SQS, sync…)', true, true],
 	['Queue history', 'Search & filter execution history', true, true],
 	['Queue history', 'Per-class runtime stats (avg, p50, p95, failure rate)', true, 'Pre-aggregated rolling buckets (1h–7d)'],
-	['Queue history', 'Live progress reported from inside a running job', true, 'Not documented'],
+	['Queue history', 'Live progress reported from inside a running job', 'Self-hosted dashboard', 'Not documented'],
 	['Queue history', 'Horizon integration — shared auth, worker snapshots, failed-job retry', true, 'Own supervisor; Horizon not required'],
 	['Incident controls', 'Cooperative cancel of a job that is already running', 'Opt-in per class', 'Pending jobs only (database driver)'],
 	['Incident controls', 'Block a single job class for 1h / 24h / until you say so', true, 'Pause whole queues, not classes'],
 	['Incident controls', 'Retry a failed execution from the dashboard', true, true],
 	['Incident controls', 'Pause / resume entire queues', false, true],
-	['Incident controls', 'Clear a pending queue backlog', true, true],
+	['Incident controls', 'Clear a pending queue backlog', 'Self-hosted dashboard', true],
 	['Alerts', '“Class X hasn’t run in 24h” alerts per job class', true, 'Overdue scheduled tasks; backlog & failure-rate rules'],
-	['Alerts', 'Alert channels', 'Any Laravel notification channel', 'Email, Slack, Discord, Teams, webhooks'],
-	['Alerts', 'Shared incident history for the whole team', 'Deck Cloud', true],
-	['Team & deployment', 'Open source, MIT, self-hosted in your app', true, true],
-	['Team & deployment', 'Hosted dashboard across many apps & environments', 'Deck Cloud', false],
-	['Team & deployment', 'Team roles & SSO for the dashboard', 'Deck Cloud', 'Your app’s auth'],
-	['Team & deployment', 'Dashboard requirements', 'Precompiled CSS, no Livewire or Vite', 'Livewire 3.5+ or 4'],
+	['Alerts', 'Alert channels', 'Slack & email', 'Email, Slack, Discord, Teams, webhooks'],
+	['Alerts', 'Shared incident history for the whole team', true, true],
+	['Team & deployment', 'Hosted dashboard across many apps & environments', true, false],
+	['Team & deployment', 'Team roles & sign-in for the dashboard', 'Roles; Google & GitHub sign-in', 'Your app’s auth'],
+	['Team & deployment', 'Pricing', 'Flat $15/team/month founding rate (regular $29)', 'Free, self-hosted'],
+	['Team & deployment', 'Open source, MIT, self-hosted in your app', 'The deck/deck package', true],
+	['Team & deployment', 'Dashboard requirements', 'Nothing to host; package uses precompiled CSS', 'Livewire 3.5+ or 4'],
 	['Team & deployment', 'PHP & Laravel', 'PHP 8.3+, Laravel 11–13', 'PHP 8.2+, Laravel 12–13'],
 	['Beyond queues', 'Artisan commands & scheduler monitoring', false, true],
 	['Beyond queues', 'Whole-app APM, trace waterfalls & Real User Monitoring', false, true],
@@ -41,13 +43,14 @@ const rows: Row[] = [
 const whyDeck = [
 	['Built for the queue problem', 'A job that silently stopped. A failure nobody can find a week later. Deck is designed around exactly these incidents, and everything in it follows from that.'],
 	['Controls, not just charts', 'Cancel a job mid-flight without SIGTERM, block one noisy class without a redeploy, and retry a failure from the same screen you found it on.'],
-	['Nothing to rip out', 'Deck listens to Laravel’s queue events on any driver. Keep Horizon, keep your workers, keep your dashboard stack. It plugs into Horizon’s authorization when you run it.'],
-	['One view across every app', 'Deck Cloud gives your whole team a hosted dashboard for every project and environment, with roles, SSO and Slack alerts. Nothing else to self-host.'],
-	['Small enough to trust in production', 'Precompiled CSS, no Livewire, no Vite, migrations that run straight from the package. Recording is built to never take down your jobs, even if Redis or the database is unavailable.'],
+	['Nothing to rip out', 'The agent listens to Laravel’s queue events on any driver and posts them to Deck Cloud. Keep Horizon, keep your workers, keep your dashboard stack.'],
+	['One view across every app, nothing to run', 'Deck Cloud gives your whole team a hosted dashboard for every project and environment, with roles, Google and GitHub sign-in, and Slack and email alerts. There is no monitoring system of your own to operate.'],
+	['A self-host path when you want it', 'The agent is the MIT deck/deck package. Run it without Cloud and it stores history in your own database with a dashboard at /deck in each app. Recording is built to never take down your jobs, even if Redis or the database is unavailable.'],
 ];
 
 const whenVigilance = [
 	'You want a single self-hosted tool for HTTP requests, queries, servers, commands and the scheduler, not just queues.',
+	'You would rather run the monitoring yourself than pay for a hosted dashboard.',
 	'Tracing waterfalls, Core Web Vitals and SLO error budgets matter to you as much as job history.',
 	'You aren’t running Horizon and want Vigilance’s own supervisor to manage workers.',
 ];
@@ -67,12 +70,13 @@ const whenVigilance = [
 					or wide on everything?
 				</h1>
 				<p class="mt-7 max-w-[640px] text-[18px] leading-[1.6] c-soft">
-					Both are MIT-licensed Laravel packages that record your queue jobs on any driver. The
-					difference is where they spend their depth. <span class="font-bold c-ink">Deck</span> goes
-					all-in on the queue incident: durable history, cooperative cancel, per-class blocking,
-					stale-job alerts, and one hosted dashboard for every app.
-					<span class="font-bold c-ink">Vigilance</span> spreads across the whole application as a
-					self-hosted APM. If queues are what keep paging you, that depth is the point.
+					Hosted or self-hosted, and deep or wide. <span class="font-bold c-ink">Deck Cloud</span> is
+					a hosted dashboard that goes all-in on the queue incident across every app and environment:
+					execution history, cooperative cancel, per-class blocking, retry and stale-job alerts. Apps
+					connect by installing the MIT deck/deck package as an agent.
+					<span class="font-bold c-ink">Vigilance</span> is an MIT package that spreads across the
+					whole application as a self-hosted APM. If queues are what keep paging you, that depth is
+					the point.
 				</p>
 				<div class="mt-9 flex flex-wrap items-center gap-4">
 					<a href="https://app.deckapp.cloud/register" class="btn btn-primary">Start 7-day free trial →</a>
@@ -82,13 +86,14 @@ const whenVigilance = [
 
 			<div class="mt-12 grid gap-6 md:grid-cols-2">
 				<div class="card-b pop-orange p-7">
-					<span class="pill bg-orange-tint c-orange-ink">Deck</span>
+					<span class="pill bg-orange-tint c-orange-ink">Deck Cloud</span>
 					<h2 class="display mt-4 text-[26px]">A memory and a control panel for your queues.</h2>
 					<p class="mt-3 text-[15px] leading-[1.6] c-soft">
-						Deck is Laravel queue monitoring with a long memory. Every dispatch lands in your database
-						with status, attempts, duration and tags, on any queue driver. From the same dashboard you
-						cancel a running job, quiet a noisy class, and get told when a class goes silent. Run Horizon and Deck plugs into it for worker snapshots
-						and failed-job retry. Deck Cloud puts every app and environment on one hosted screen.
+						Deck Cloud is hosted Laravel queue monitoring. The agent in each app sends every execution
+						with status, attempts, duration and tags, on any queue driver, and Cloud keeps 90 days of
+						it for every project and environment on one screen. From there you cancel a running job,
+						block a noisy class, retry a failure and get told when a class goes silent. Prefer to
+						self-host? The same MIT package stores history in your own database instead.
 					</p>
 				</div>
 				<div class="card-b p-7">
@@ -111,7 +116,7 @@ const whenVigilance = [
 			<span class="pill bg-sun-tint c-ink">Side by side</span>
 			<h2 class="display mt-5 text-[40px] sm:text-[48px]">What each one does.</h2>
 			<p class="mt-4 text-[17px] leading-[1.6] c-soft">
-				A checkmark means the capability ships in the package today. Where a plain yes or no would
+				A checkmark means the capability ships today. Where a plain yes or no would
 				be misleading, the cell says what actually happens.
 			</p>
 		</div>
@@ -128,12 +133,12 @@ const whenVigilance = [
 
 		<div class="card-b bg-sun-tint mt-10 flex flex-col items-start gap-5 p-7 sm:flex-row sm:items-center sm:justify-between">
 			<div>
-				<p class="display text-[22px]">See the queue side of that table in your own app.</p>
-				<p class="mt-1.5 text-[14.5px] c-soft">The package is MIT and takes one composer require. Deck Cloud is free for 7 days.</p>
+				<p class="display text-[22px]">Connect your apps to Deck Cloud.</p>
+				<p class="mt-1.5 text-[14.5px] c-soft">Install the MIT agent, set DECK_API_KEY, DECK_PROJECT and DECK_ENVIRONMENT. Free for 7 days.</p>
 			</div>
 			<div class="flex flex-wrap items-center gap-3">
 				<a href="https://app.deckapp.cloud/register" class="btn btn-primary">Start free trial →</a>
-				<a href="/package/getting-started/" class="btn btn-paper">Install the package</a>
+				<a href="/package/getting-started/" class="btn btn-paper">Install the agent</a>
 			</div>
 		</div>
 	</section>
@@ -146,9 +151,10 @@ const whenVigilance = [
 				<h2 class="display mt-5 text-[40px] sm:text-[48px]">Start with the problem that paged you.</h2>
 				<p class="mt-4 text-[17px] leading-[1.6] c-soft">
 					Neither tool is a strict superset of the other. For most Laravel teams the thing that
-					actually pages them is a queue problem, and that is the one Deck is built to end. If you are
-					searching for a Vigilance alternative that goes deeper on queues, that is exactly where Deck
-					sits. Here is the case for Deck, and the cases where Vigilance is the better fit.
+					actually pages them is a queue problem, and that is the one Deck Cloud is built to end. If
+					you are searching for a Vigilance alternative that goes deeper on queues and that you don’t
+					have to run yourself, that is exactly where Deck Cloud sits. Here is the case for it, and the
+					cases where Vigilance is the better fit.
 				</p>
 			</div>
 
@@ -176,7 +182,8 @@ const whenVigilance = [
 					</ul>
 					<p class="mt-6 text-[14px] leading-[1.6] c-soft">
 						If that is you, Vigilance is a serious, well-built option and you should evaluate it.
-						You will be choosing breadth over depth on queues, and running one more full system.
+						You will be choosing breadth over depth on queues, and running one more full system. If
+						self-hosting is the deciding factor, the deck/deck package is free and MIT too.
 					</p>
 				</div>
 			</div>
@@ -187,9 +194,10 @@ const whenVigilance = [
 					Deck is deliberately narrow, so it sits next to whatever you use for errors and
 					performance today: Horizon for workers, an error tracker for exceptions, an APM for
 					requests. You add a memory and a control panel for your queues without changing any of
-					them. Running Deck and Vigilance together is technically possible, since both listen to
-					Laravel’s queue events, but each keeps its own execution rows and you would pay the storage
-					twice. Pick one for queue history, and pick it for the incidents you actually have.
+					them or your workers. Running Deck and Vigilance together is technically possible, since
+					both listen to Laravel’s queue events, but you would be recording every job twice. Pick one
+					for queue history, and pick it for the incidents you actually have. The 7-day trial is the
+					quickest way to check.
 				</p>
 			</div>
 		</div>

@@ -18,30 +18,33 @@ const compareRows = [
 ];
 ---
 
-<MarketingLayout>
+<MarketingLayout
+	title="Deck Cloud — Hosted Laravel Queue Observability & Job History Dashboard"
+	description="Deck Cloud is one hosted dashboard for every Laravel app and environment you run: durable job history, stale-job alerts, remote cancel and retry, and shared incident history. Works alongside Horizon."
+>
 	<SiteHeader />
 
 	<!-- ═══ hero ═════════════════════════════════════════════ -->
 	<section class="warm-top">
 		<div class="mx-auto grid max-w-[1180px] items-center gap-12 px-5 py-16 lg:grid-cols-[1.05fr_0.95fr] lg:py-24">
 			<div>
-				<span class="pill bg-sun-tint c-ink"><span class="size-2 rounded-full bg-orange"></span>Laravel queue observability</span>
+				<span class="pill bg-sun-tint c-ink"><span class="size-2 rounded-full bg-orange"></span>Deck Cloud · hosted Laravel queue observability</span>
 				<h1 class="display mt-6 text-[52px] sm:text-[68px] lg:text-[76px]">
 					A job stopped.<br />
 					<span class="c-orange">Nobody</span> noticed<br />
 					<span class="relative inline-block">until a customer did.</span>
 				</h1>
 				<p class="mt-7 max-w-[500px] text-[18px] leading-[1.6] c-soft">
-					Horizon flies the workers. <span class="font-bold c-ink">Deck</span> runs the operation —
-					a durable, searchable log of every dispatch, so the next silent failure trips an alert
-					instead of a support ticket.
+					<span class="font-bold c-ink">Deck Cloud</span> is one hosted dashboard for every Laravel app
+					and environment you run — a durable, searchable log of every job, so the next silent failure
+					alerts your team instead of becoming a support ticket.
 				</p>
 				<div class="mt-9 flex flex-wrap items-center gap-4">
 					<a href="https://app.deckapp.cloud/register" class="btn btn-primary">Start 7-day free trial →</a>
-					<a href="/overview/" class="btn btn-paper">Read the docs</a>
+					<a href="#pricing" class="btn btn-paper">See pricing</a>
 				</div>
-				<p class="mono mt-6 inline-flex items-center gap-2 text-[13.5px] c-soft">
-					<span class="c-faint">$</span> composer require <span class="font-semibold c-orange">deck/deck</span>
+				<p class="mt-6 text-[14px] c-soft">
+					<span class="font-bold c-ink">$15 / team / mo</span> founding rate · unlimited projects · connect an app in minutes
 				</p>
 			</div>
 
@@ -51,7 +54,7 @@ const compareRows = [
 					<div class="flex items-center justify-between gap-2 border-b border-[color:var(--border)] bg-paper2 px-4 py-3">
 						<div class="flex items-center gap-2 text-[13px] font-bold">
 							<span class="size-2.5 rounded-full bg-orange"></span>
-							acme-api <span class="c-faint font-medium">/ production</span>
+							Deck Cloud <span class="c-faint font-medium">/ acme-api / production</span>
 						</div>
 						<span class="mono flex items-center gap-1.5 text-[12px] c-green font-semibold"><span class="size-2 rounded-full bg-green"></span>live</span>
 					</div>
@@ -89,6 +92,33 @@ const compareRows = [
 
 	<CloudSpotlight />
 
+	<!-- ═══ how it works ═════════════════════════════════════ -->
+	<section id="how-it-works" class="mx-auto max-w-[1180px] px-5 py-20">
+		<div class="max-w-[640px]">
+			<span class="pill bg-teal-tint c-teal">How it works</span>
+			<h2 class="display mt-5 text-[40px] sm:text-[48px]">Connected in minutes.<br />No new infrastructure.</h2>
+			<p class="mt-4 text-[17px] leading-[1.6] c-soft">
+				Each Laravel app runs the open-source Deck agent and reports job events to Deck Cloud. Your
+				workers, queues and Horizon setup stay exactly as they are.
+			</p>
+		</div>
+		<ol class="mt-12 grid gap-6 md:grid-cols-3">
+			{
+				[
+					['1', 'Start your trial', 'Create your team on Deck Cloud and add a project for each app you run.'],
+					['2', 'Install the agent', 'composer require deck/deck, then set DECK_API_KEY, DECK_PROJECT and DECK_ENVIRONMENT.'],
+					['3', 'Watch the whole fleet', 'Every dispatch shows up in one dashboard — with alerts when a job class fails, stalls or goes quiet.'],
+				].map(([n, title, body]) => (
+					<li class="card-b pop-sm p-6">
+						<span class="display inline-flex size-10 items-center justify-center rounded-full bg-orange text-[18px] c-paper">{n}</span>
+						<h3 class="display mt-5 text-[21px]">{title}</h3>
+						<p class="mt-2 text-[14.5px] leading-[1.55] c-soft">{body}</p>
+					</li>
+				))
+			}
+		</ol>
+	</section>
+
 	<Features />
 
 	<!-- ═══ monitoring / history ═════════════════════════════ -->
@@ -96,19 +126,18 @@ const compareRows = [
 		<div class="mx-auto grid max-w-[1180px] gap-10 px-5 py-20 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
 			<div>
 				<span class="pill bg-orange-tint c-orange-ink">Queues need a memory</span>
-				<h2 class="display mt-5 text-[40px] sm:text-[48px]">Laravel queue monitoring, without losing history</h2>
+				<h2 class="display mt-5 text-[40px] sm:text-[48px]">Hosted Laravel queue monitoring, without losing history</h2>
 			</div>
 			<div class="max-w-[600px] text-[17px] leading-[1.6] c-soft">
 				<p>
-					Deck is for monitoring Laravel queues and jobs after the fact, not just while they run.
-					Every dispatch is written to your own database, so you can track job execution history
-					beyond Redis retention: what ran, what failed, how long it took, and how often.
+					Deck Cloud is for monitoring Laravel queues and jobs after the fact, not just while they run.
+					Every dispatch from every app is recorded in one place, so you can track job execution
+					history beyond Redis retention: what ran, what failed, how long it took, and how often.
 				</p>
 				<p class="mt-4">
-					It works on any Laravel queue driver, and ships as a Horizon-compatible dashboard that
-					plugs into Horizon's authorization when you run it, with no changes to your workers.
-					Search a week-old failure by class, queue or UUID, cancel a runaway job, or quiet a noisy
-					class, all from the same screen.
+					It works on any Laravel queue driver and alongside Horizon, with no changes to your workers.
+					Search a week-old failure by class, queue or UUID, cancel or retry a job remotely, or quiet
+					a noisy class, all from the same screen — for every project and environment your team runs.
 				</p>
 			</div>
 		</div>
@@ -153,44 +182,32 @@ const compareRows = [
 		<div class="mx-auto max-w-[1180px] px-5 py-20">
 			<div class="max-w-[640px]">
 				<span class="pill bg-orange-tint c-orange-ink">Pricing</span>
-				<h2 class="display mt-5 text-[40px] sm:text-[48px]">Free where it runs.<br />Paid where it scales.</h2>
+				<h2 class="display mt-5 text-[40px] sm:text-[48px]">One dashboard.<br />One flat price per team.</h2>
 				<p class="mt-4 text-[17px] leading-[1.6] c-soft">
-					The package is and always will be MIT. Deck Cloud is one dashboard for teams running many
-					apps and environments.
+					Deck Cloud covers every app and environment your team runs, for one flat monthly price.
+					Prefer to host it yourself? The open-source package is free forever.
 				</p>
 			</div>
 
 			<div class="mt-12 grid gap-6 lg:grid-cols-3 lg:items-start">
-				<!-- self-hosted -->
-				<div class="card-b p-7">
-					<h3 class="display text-[24px]">Self-hosted</h3>
-					<span class="pill bg-sun-tint c-ink mt-2 text-[11px]">Open source · MIT</span>
-					<div class="mt-5 flex items-baseline gap-2">
-						<span class="display text-[46px]">$0</span>
-						<span class="c-faint">forever</span>
-					</div>
-					<p class="mt-3 text-[14px] leading-[1.5] c-soft">The MIT package. Runs in your Laravel app, stores in your database.</p>
-					<a href="https://github.com/getdeckapp/deck" class="btn btn-paper mt-6 w-full justify-center">composer require →</a>
-					<ul class="mt-7 space-y-2.5 text-[14px]">
-						{['Full dashboard at /deck', 'Durable execution log in your DB', 'Cooperative cancel + retry', 'Stale-job alerts via your channels', 'Block / unblock job classes', 'Tagged for Deck Cloud'].map((f) => (
-							<li class="flex items-start gap-2.5"><span class="c-teal font-bold">✓</span><span>{f}</span></li>
-						))}
-					</ul>
-				</div>
-
 				<!-- cloud team (featured) -->
 				<div class="card-b pop-orange bg-ink c-paper relative -mt-2 p-7 lg:-mt-4 lg:mb-2">
 					<span class="pill bg-orange c-paper absolute -top-3 right-6 border-paper text-[11px]" style="border-color:var(--paper)">★ Most popular</span>
 					<h3 class="display text-[24px] c-paper">Cloud Team</h3>
-					<span class="pill bg-orange c-paper mt-2 text-[11px]">7-day free trial</span>
-					<div class="mt-5 flex items-baseline gap-2">
-						<span class="display text-[46px] c-sun">$29</span>
-						<span class="text-[color:var(--paper)]/70">/ team / mo</span>
+					<div class="mt-2 flex flex-wrap gap-2">
+						<span class="pill bg-orange c-paper text-[11px]">7-day free trial</span>
+						<span class="pill bg-sun c-ink text-[11px]">Founding customer pricing</span>
 					</div>
+					<div class="mt-5 flex items-baseline gap-2">
+						<span class="display text-[46px] c-sun">$15</span>
+						<span class="text-[color:var(--paper)]/70">/ team / mo</span>
+						<s class="ml-1 text-[15px] text-[color:var(--paper)]/50"><span class="sr-only">Regular price </span>$29</s>
+					</div>
+					<p class="mt-1 text-[12.5px] text-[color:var(--paper)]/60">Regular price $29 / team / mo. Subscribe during early access and $15 is locked in for as long as you stay subscribed.</p>
 					<p class="mt-3 text-[14px] leading-[1.5] text-[color:var(--paper)]/80">One hosted dashboard for your whole team — unlimited projects and environments.</p>
 					<a href="https://app.deckapp.cloud/register" class="btn btn-primary mt-6 w-full justify-center">Start free trial →</a>
 					<ul class="mt-7 space-y-2.5 text-[14px]">
-						{['Unlimited projects & environments', 'Shared incident history', 'Slack + email notifications', 'Team roles & SSO (Google, GitHub)', '30-day execution retention', 'Up to 10M executions / month', 'Email support'].map((f) => (
+						{['Unlimited projects & environments', 'Shared incident history', 'Slack + email notifications', 'Team roles & SSO (Google, GitHub)', '90-day execution retention', 'Up to 10M executions / month', 'Email support'].map((f) => (
 							<li class="flex items-start gap-2.5"><span class="c-sun font-bold">✓</span><span>{f}</span></li>
 						))}
 					</ul>
@@ -213,9 +230,34 @@ const compareRows = [
 						))}
 					</ul>
 				</div>
+				<!-- self-hosted -->
+				<div class="card-b p-7">
+					<h3 class="display text-[24px]">Self-hosted</h3>
+					<span class="pill bg-sun-tint c-ink mt-2 text-[11px]">Open source · MIT</span>
+					<div class="mt-5 flex items-baseline gap-2">
+						<span class="display text-[46px]">$0</span>
+						<span class="c-faint">forever</span>
+					</div>
+					<p class="mt-3 text-[14px] leading-[1.5] c-soft">The MIT package on its own. One dashboard per app, stored in that app's database.</p>
+					<a href="https://github.com/getdeckapp/deck" class="btn btn-paper mt-6 w-full justify-center">composer require →</a>
+					<ul class="mt-7 space-y-2.5 text-[14px]">
+						{['Full dashboard at /deck', 'Durable execution log in your DB', 'Cooperative cancel + retry', 'Stale-job alerts via your channels', 'Block / unblock job classes', 'Tagged for Deck Cloud'].map((f) => (
+							<li class="flex items-start gap-2.5"><span class="c-teal font-bold">✓</span><span>{f}</span></li>
+						))}
+					</ul>
+				</div>
+
 			</div>
-			<p class="mt-10 text-center text-[14px] c-soft">
-				Every Cloud Team plan starts with a <span class="font-bold c-orange">7-day free trial</span> — no credit card, no charge until it ends.
+			<div class="card-b mx-auto mt-10 max-w-[760px] p-6 text-[14.5px] leading-[1.6]">
+				<span class="pill bg-sun-tint c-ink text-[11px]">Founding customer pricing</span>
+				<p class="mt-3 c-soft">
+					Cloud Team is <span class="font-bold c-ink">$15 / team / mo</span> for teams that subscribe now, during early
+					access. That rate is locked in permanently for as long as your subscription stays active — it won't go up
+					later, even once the regular <s>$29</s> price applies to new customers.
+				</p>
+			</div>
+			<p class="mt-6 text-center text-[14px] c-soft">
+				Every Cloud Team plan starts with a <span class="font-bold c-orange">7-day free trial</span>. We collect a card at checkout but don't charge it until the trial ends — cancel before then and you pay nothing.
 			</p>
 		</div>
 	</section>

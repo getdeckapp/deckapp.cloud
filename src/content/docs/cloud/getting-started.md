@@ -27,7 +27,7 @@ Generate keys at **Settings → API keys**. The plain token is shown **once** at
 
 ## Team and billing
 
-Invite teammates at **Settings → Team**. Manage subscription and invoices at **Settings → Billing**. Every team starts on a 7-day free trial — you keep full access during the trial and are only charged once it ends. Add a payment method under **Settings → Billing** before the trial expires to keep Cloud features active.
+Invite teammates at **Settings → Team**. Manage subscription and invoices at **Settings → Billing**. Every team starts on a 7-day free trial with full access. Stripe collects a card when you start the trial but doesn't charge it until the trial ends; cancel from **Settings → Billing** before then and you won't be billed.
 
 ## Connect your apps
 
